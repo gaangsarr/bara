@@ -5,6 +5,7 @@ import { OrbitControls, useGLTF, Environment, Html } from "@react-three/drei";
 import { Suspense, useState, useRef, useEffect } from "react";
 import type { ThreeEvent } from "@react-three/fiber";
 import type { Object3D } from "three";
+import Loader3D from "@/components/Loader3D";
 
 // Type untuk area info
 type AreaInfo = {
@@ -45,7 +46,7 @@ const areaInfo: Record<AreaKey, AreaInfo> = {
 };
 
 function CompleteScene() {
-  const { scene } = useGLTF("/models/BARA.glb");
+  const { scene } = useGLTF("/models/BARAPASIR-COMP.glb");
   const { camera } = useThree(); // Ambil camera reference
   const [selectedArea, setSelectedArea] = useState<AreaKey | null>(null);
   const [clickPosition, setClickPosition] = useState<[number, number, number]>([
@@ -201,7 +202,7 @@ function CompleteScene() {
   );
 }
 
-useGLTF.preload("/models/BARA.glb");
+useGLTF.preload("/models/BARAPASIR-COMP.glb");
 
 function Loader() {
   return (
@@ -224,7 +225,9 @@ export default function ThreeDPage() {
         camera={{ position: [5, 2, 5], fov: 27 }}
         gl={{ antialias: true, alpha: true }}
       >
-        <Suspense fallback={<Loader />}>
+        <Suspense fallback={<Loader3D />}>
+          {" "}
+          {/* Ganti dari <Loader /> */}
           <color attach="background" args={["#f8f9fa"]} />
           <ambientLight intensity={0.8} />
           <directionalLight position={[10, 10, 5]} intensity={1.2} />
