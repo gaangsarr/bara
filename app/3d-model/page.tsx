@@ -3,9 +3,22 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Environment, Html } from "@react-three/drei";
 import { Suspense, useState, useRef, useEffect } from "react";
+import type { ThreeEvent } from "@react-three/fiber";
+import type { Object3D } from "three";
+
+// Type untuk area info
+type AreaInfo = {
+  name: string;
+  title: string;
+  description: string;
+  specs: string[];
+  color: string;
+};
+
+type AreaKey = "LeftArea" | "CenterArea" | "RightArea";
 
 // Informasi untuk 3 area
-const areaInfo = {
+const areaInfo: Record<AreaKey, AreaInfo> = {
   LeftArea: {
     name: "Renewable Energy Source",
     title: "Solar & Wind Power",
@@ -33,9 +46,11 @@ const areaInfo = {
 
 function CompleteScene() {
   const { scene } = useGLTF("/models/3DMODEL1-COMP.glb");
-  const [selectedArea, setSelectedArea] = useState(null);
-  const [clickPosition, setClickPosition] = useState([0, 0, 0]);
-  const groupRefs = useRef({});
+  const [selectedArea, setSelectedArea] = useState<AreaKey | null>(null);
+  const [clickPosition, setClickPosition] = useState<[number, number, number]>([
+    0, 0, 0,
+  ]);
+  const groupRefs = useRef<Record<string, Object3D>>({});
 
   useEffect(() => {
     // Find dan simpan reference ke setiap group area
@@ -52,17 +67,17 @@ function CompleteScene() {
     });
   }, [scene]);
 
-  const handleClick = (event) => {
+  const handleClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
 
     // Cari parent group dari object yang di-klik
-    let clickedObject = event.object;
-    let areaName = null;
+    let clickedObject: Object3D | null = event.object;
+    let areaName: AreaKey | null = null;
 
     // Traverse up untuk cari parent group
     while (clickedObject && !areaName) {
-      if (clickedObject.name && areaInfo[clickedObject.name]) {
-        areaName = clickedObject.name;
+      if (clickedObject.name && clickedObject.name in areaInfo) {
+        areaName = clickedObject.name as AreaKey;
         break;
       }
       clickedObject = clickedObject.parent;
@@ -79,7 +94,7 @@ function CompleteScene() {
     console.log("Clicked area:", areaName, "at position:", event.point);
 
     setSelectedArea(areaName);
-    setClickPosition(event.point.toArray());
+    setClickPosition([event.point.x, event.point.y, event.point.z]);
   };
 
   const info = selectedArea ? areaInfo[selectedArea] : null;
