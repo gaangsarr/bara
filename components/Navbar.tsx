@@ -108,7 +108,7 @@ export default function Navbar() {
       {/* Backdrop Overlay */}
       {isMenuOpen && (
         <div
-          className="fixed inset-0 md:hidden"
+          className="fixed inset-0 md:hidden bg-white/50 z-49 h-full"
           onClick={() => setIsMenuOpen(false)}
         ></div>
       )}
