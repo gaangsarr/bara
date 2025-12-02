@@ -45,7 +45,7 @@ const areaInfo: Record<AreaKey, AreaInfo> = {
 };
 
 function CompleteScene() {
-  const { scene } = useGLTF("/models/3DMODEL1-COMP.glb");
+  const { scene } = useGLTF("/models/BARA.glb");
   const { camera } = useThree(); // Ambil camera reference
   const [selectedArea, setSelectedArea] = useState<AreaKey | null>(null);
   const [clickPosition, setClickPosition] = useState<[number, number, number]>([
@@ -201,12 +201,12 @@ function CompleteScene() {
   );
 }
 
-useGLTF.preload("/models/3DMODEL1-COMP.glb");
+useGLTF.preload("/models/BARA.glb");
 
 function Loader() {
   return (
     <Html center>
-      <div style={{ color: "white", fontSize: "20px" }}>Loading Scene...</div>
+      <div style={{ color: "black", fontSize: "20px" }}>Loading...</div>
     </Html>
   );
 }
@@ -221,7 +221,7 @@ export default function ThreeDPage() {
       }}
     >
       <Canvas
-        camera={{ position: [4, 2, 5], fov: 30 }}
+        camera={{ position: [5, 2, 5], fov: 27 }}
         gl={{ antialias: true, alpha: true }}
       >
         <Suspense fallback={<Loader />}>
