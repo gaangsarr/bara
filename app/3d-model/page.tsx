@@ -1,6 +1,6 @@
 "use client";
 
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree, useFrame } from "@react-three/fiber"; // Tambah useThree & useFrame
 import { OrbitControls, useGLTF, Environment, Html } from "@react-three/drei";
 import { Suspense, useState, useRef, useEffect } from "react";
 import type { ThreeEvent } from "@react-three/fiber";
@@ -46,10 +46,12 @@ const areaInfo: Record<AreaKey, AreaInfo> = {
 
 function CompleteScene() {
   const { scene } = useGLTF("/models/3DMODEL1-COMP.glb");
+  const { camera } = useThree(); // Ambil camera reference
   const [selectedArea, setSelectedArea] = useState<AreaKey | null>(null);
   const [clickPosition, setClickPosition] = useState<[number, number, number]>([
     0, 0, 0,
   ]);
+  const [cameraDistance, setCameraDistance] = useState(8); // State untuk jarak kamera
   const groupRefs = useRef<Record<string, Object3D>>({});
 
   useEffect(() => {
@@ -62,19 +64,23 @@ function CompleteScene() {
           child.name.includes("Right"))
       ) {
         groupRefs.current[child.name] = child;
-        console.log("Found area:", child.name); // Debug
+        console.log("Found area:", child.name);
       }
     });
   }, [scene]);
 
+  // Update jarak kamera setiap frame
+  useFrame(() => {
+    const distance = camera.position.length();
+    setCameraDistance(distance);
+  });
+
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
 
-    // Cari parent group dari object yang di-klik
     let clickedObject: Object3D | null = event.object;
     let areaName: AreaKey | null = null;
 
-    // Traverse up untuk cari parent group
     while (clickedObject && !areaName) {
       if (clickedObject.name && clickedObject.name in areaInfo) {
         areaName = clickedObject.name as AreaKey;
@@ -83,7 +89,6 @@ function CompleteScene() {
       clickedObject = clickedObject.parent;
     }
 
-    // Fallback: detect berdasarkan posisi X jika nama tidak ketemu
     if (!areaName) {
       const x = event.point.x;
       if (x < -2) areaName = "LeftArea";
@@ -91,7 +96,7 @@ function CompleteScene() {
       else areaName = "CenterArea";
     }
 
-    console.log("Clicked area:", areaName, "at position:", event.point);
+    console.log("Clicked area:", areaName, "Camera distance:", cameraDistance);
 
     setSelectedArea(areaName);
     setClickPosition([event.point.x, event.point.y, event.point.z]);
@@ -104,7 +109,11 @@ function CompleteScene() {
       <primitive object={scene} scale={0.5} position={[0, -1, 0]} />
 
       {info && (
-        <Html position={clickPosition} center distanceFactor={8}>
+        <Html
+          position={clickPosition}
+          center
+          distanceFactor={4} // Fixed value (makin besar = makin kecil card)
+        >
           <div
             style={{
               background: `linear-gradient(135deg, ${info.color} 0%, ${info.color}dd 100%)`,
@@ -204,16 +213,23 @@ function Loader() {
 
 export default function ThreeDPage() {
   return (
-    <div style={{ width: "100vw", height: "100vh" }}>
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        background: "linear-gradient(180deg, #f0f0f0 0%, #ffffff 100%)",
+      }}
+    >
       <Canvas
-        camera={{ position: [4, 2, 5], fov: 50 }}
-        gl={{ antialias: true, alpha: false }}
+        camera={{ position: [4, 2, 5], fov: 30 }}
+        gl={{ antialias: true, alpha: true }}
       >
         <Suspense fallback={<Loader />}>
-          <ambientLight intensity={0.6} />
-          <directionalLight position={[10, 10, 5]} intensity={1} />
+          <color attach="background" args={["#f8f9fa"]} />
+          <ambientLight intensity={0.8} />
+          <directionalLight position={[10, 10, 5]} intensity={1.2} />
           <CompleteScene />
-          <Environment preset="sunset" />
+          <Environment preset="city" />
           <OrbitControls
             enableZoom
             enablePan
