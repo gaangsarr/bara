@@ -1,9 +1,12 @@
 import Image from "next/image";
+import HeroSection from "@/components/HeroSection";
+import AboutSection from "@/components/AboutSection";
 
 export default function Home() {
   return (
-    <div className="min-h-screen items-center justify-center">
-      <h1>Hello</h1>
+    <div>
+      <HeroSection />
+      <AboutSection />
     </div>
   );
 }

@@ -6,7 +6,6 @@ import { Suspense, useState, useRef, useEffect } from "react";
 import type { ThreeEvent } from "@react-three/fiber";
 import type { Object3D } from "three";
 import { ErrorBoundary3D } from "@/components/ErrorBoundary3D";
-import Loader3D from "@/components/Loader3D";
 import Link from "next/link";
 
 // Type untuk area info
@@ -20,7 +19,6 @@ type AreaInfo = {
 
 type AreaKey = "LeftArea" | "CenterArea" | "RightArea";
 
-// Informasi untuk 3 area dengan color palette
 const areaInfo: Record<AreaKey, AreaInfo> = {
   LeftArea: {
     name: "Renewable Energy Source",
@@ -28,14 +26,14 @@ const areaInfo: Record<AreaKey, AreaInfo> = {
     description:
       "Pembangkit listrik tenaga surya dan angin yang menghasilkan energi bersih",
     specs: ["Solar: 2 MW", "Wind: 3 MW", "Total: 5 MW"],
-    color: "#00A3E0", // Biru Muda
+    color: "#00A3E0",
   },
   CenterArea: {
     name: "Sand Battery",
     title: "Sand Battery Storage",
     description: "Sistem penyimpanan energi thermal berbasis sand battery",
     specs: ["Kapasitas: 8 MWh", "Suhu: 500-600°C", "Efisiensi: 95%"],
-    color: "#005792", // Biru Tua
+    color: "#005792",
   },
   RightArea: {
     name: "Industrial Complex",
@@ -43,11 +41,11 @@ const areaInfo: Record<AreaKey, AreaInfo> = {
     description:
       "Kompleks industri yang menggunakan energi dari sistem penyimpanan",
     specs: ["Konsumsi: 4 MW", "24/7 supply", "150+ buildings"],
-    color: "#FD5F00", // Orange
+    color: "#FD5F00",
   },
 };
 
-function CompleteScene() {
+function CompleteScene({ onLoaded }: { onLoaded: () => void }) {
   const { scene } = useGLTF("/models/BARAPASIR-COMP.glb");
   const { camera } = useThree();
   const [selectedArea, setSelectedArea] = useState<AreaKey | null>(null);
@@ -66,10 +64,12 @@ function CompleteScene() {
           child.name.includes("Right"))
       ) {
         groupRefs.current[child.name] = child;
-        console.log("Found area:", child.name);
       }
     });
-  }, [scene]);
+
+    // Notify parent bahwa model sudah loaded
+    onLoaded();
+  }, [scene, onLoaded]);
 
   useFrame(() => {
     const distance = camera.position.length();
@@ -97,8 +97,6 @@ function CompleteScene() {
       else areaName = "CenterArea";
     }
 
-    console.log("Clicked area:", areaName, "Camera distance:", cameraDistance);
-
     setSelectedArea(areaName);
     setClickPosition([event.point.x, event.point.y, event.point.z]);
   };
@@ -114,7 +112,7 @@ function CompleteScene() {
           <div
             style={{
               background: `linear-gradient(135deg, ${info.color} 0%, ${info.color}dd 100%)`,
-              color: "#F6F6E9", // Cream untuk text
+              color: "#F6F6E9",
               padding: "20px",
               borderRadius: "12px",
               boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
@@ -122,7 +120,7 @@ function CompleteScene() {
               maxWidth: "350px",
               pointerEvents: "auto",
               fontFamily: "var(--font-poppins), system-ui, sans-serif",
-              border: "2px solid rgba(246,246,233,0.3)", // Cream border
+              border: "2px solid rgba(246,246,233,0.3)",
             }}
           >
             <div
@@ -163,7 +161,7 @@ function CompleteScene() {
 
             <div
               style={{
-                background: "rgba(246,246,233,0.15)", // Cream dengan transparansi
+                background: "rgba(246,246,233,0.15)",
                 padding: "10px",
                 borderRadius: "6px",
                 marginBottom: "12px",
@@ -191,8 +189,8 @@ function CompleteScene() {
               style={{
                 width: "100%",
                 padding: "10px",
-                background: "#F6F6E9", // Cream background
-                color: info.color, // Text warna sesuai area
+                background: "#F6F6E9",
+                color: info.color,
                 border: "none",
                 borderRadius: "6px",
                 cursor: "pointer",
@@ -218,16 +216,126 @@ function CompleteScene() {
   );
 }
 
-useGLTF.preload("/models/BARAPASIR-COMP.glb");
+// Loader Component
+function Loader3D() {
+  return (
+    <Html center>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "15px",
+        }}
+      >
+        <div
+          style={{
+            width: "60px",
+            height: "60px",
+            border: "4px solid #005792",
+            borderTop: "4px solid #FD5F00",
+            borderRadius: "50%",
+            animation: "spin 0.8s linear infinite",
+          }}
+        />
+        <div
+          style={{
+            fontSize: "16px",
+            color: "#005792",
+            fontWeight: "600",
+            fontFamily: "var(--font-poppins), system-ui, sans-serif",
+            whiteSpace: "nowrap",
+          }}
+        >
+          Loading 3D Model...
+        </div>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    </Html>
+  );
+}
 
 export default function ThreeDPage() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [modelLoaded, setModelLoaded] = useState(false);
+  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
+
+  useEffect(() => {
+    // Timer minimal 1 detik
+    const timer = setTimeout(() => {
+      setMinTimeElapsed(true);
+    }, 800); // 1000ms = 1 detik
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    // Loader hilang HANYA jika model sudah loaded DAN minimal 1 detik sudah lewat
+    if (modelLoaded && minTimeElapsed) {
+      setIsLoading(false);
+    }
+  }, [modelLoaded, minTimeElapsed]);
+
+  const handleModelLoaded = () => {
+    setModelLoaded(true);
+  };
+
   return (
     <ErrorBoundary3D>
+      {/* Full Screen Loader - Hilang setelah model loaded DAN minimal 1 detik */}
+      {isLoading && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "#FFFFFF",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              width: "70px",
+              height: "70px",
+              border: "5px solid #005792",
+              borderTop: "5px solid #FD5F00",
+              borderRadius: "50%",
+              animation: "spin 0.8s linear infinite",
+              marginBottom: "20px",
+            }}
+          />
+          <div
+            style={{
+              fontSize: "20px",
+              color: "#005792",
+              fontWeight: "600",
+              fontFamily: "var(--font-poppins), system-ui, sans-serif",
+            }}
+          >
+            Loading 3D Model...
+          </div>
+          <style>{`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
+      )}
+
       <div
         style={{
           width: "100vw",
           height: "100vh",
-          background: "linear-gradient(180deg, #f0f0f0 0%, #ffffff 100%)",
+          background: "#FFFFFF",
           position: "relative",
         }}
       >
@@ -286,14 +394,12 @@ export default function ThreeDPage() {
           gl={{ antialias: true, alpha: true }}
         >
           <Suspense fallback={<Loader3D />}>
-            <color attach="background" args={["#f8f9fa"]} />
+            <color attach="background" args={["#FFFFFF"]} />
             <ambientLight intensity={0.8} />
             <directionalLight position={[10, 10, 5]} intensity={1.2} />
-            <CompleteScene />
 
-            <Suspense fallback={null}>
-              <Environment preset="city" />
-            </Suspense>
+            <CompleteScene onLoaded={handleModelLoaded} />
+            <Environment preset="city" />
 
             <OrbitControls
               enableZoom

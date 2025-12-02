@@ -13,7 +13,11 @@ export const metadata: Metadata = {
   title: "BARA PROJECT",
   description: "Sand Battery Energy Storage System - Renewable Energy Solution",
   keywords: ["sand battery", "renewable energy", "energy storage"],
-  authors: [{ name: "BARA Team" }],
+  authors: [
+    {
+      name: "BARA Team | Gangsar Anjasmoro, Abdul Akyas Sugianto, Aisyah Nur Kusuma Wardhani",
+    },
+  ],
   openGraph: {
     title: "BARA PROJECT",
     description: "Sand Battery Energy Storage System",
