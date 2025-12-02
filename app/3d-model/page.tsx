@@ -20,7 +20,7 @@ type AreaInfo = {
 
 type AreaKey = "LeftArea" | "CenterArea" | "RightArea";
 
-// Informasi untuk 3 area
+// Informasi untuk 3 area dengan color palette
 const areaInfo: Record<AreaKey, AreaInfo> = {
   LeftArea: {
     name: "Renewable Energy Source",
@@ -28,14 +28,14 @@ const areaInfo: Record<AreaKey, AreaInfo> = {
     description:
       "Pembangkit listrik tenaga surya dan angin yang menghasilkan energi bersih",
     specs: ["Solar: 2 MW", "Wind: 3 MW", "Total: 5 MW"],
-    color: "#10b981",
+    color: "#00A3E0", // Biru Muda
   },
   CenterArea: {
     name: "Sand Battery",
     title: "Sand Battery Storage",
     description: "Sistem penyimpanan energi thermal berbasis sand battery",
     specs: ["Kapasitas: 8 MWh", "Suhu: 500-600°C", "Efisiensi: 95%"],
-    color: "#4a9eff",
+    color: "#005792", // Biru Tua
   },
   RightArea: {
     name: "Industrial Complex",
@@ -43,7 +43,7 @@ const areaInfo: Record<AreaKey, AreaInfo> = {
     description:
       "Kompleks industri yang menggunakan energi dari sistem penyimpanan",
     specs: ["Konsumsi: 4 MW", "24/7 supply", "150+ buildings"],
-    color: "#f59e0b",
+    color: "#FD5F00", // Orange
   },
 };
 
@@ -114,24 +114,25 @@ function CompleteScene() {
           <div
             style={{
               background: `linear-gradient(135deg, ${info.color} 0%, ${info.color}dd 100%)`,
-              color: "white",
+              color: "#F6F6E9", // Cream untuk text
               padding: "20px",
               borderRadius: "12px",
               boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
               minWidth: "280px",
               maxWidth: "350px",
               pointerEvents: "auto",
-              fontFamily: "system-ui, sans-serif",
-              border: "2px solid rgba(255,255,255,0.3)",
+              fontFamily: "var(--font-poppins), system-ui, sans-serif",
+              border: "2px solid rgba(246,246,233,0.3)", // Cream border
             }}
           >
             <div
               style={{
                 fontSize: "11px",
-                opacity: 0.85,
+                opacity: 0.9,
                 marginBottom: "6px",
                 textTransform: "uppercase",
                 letterSpacing: "1.5px",
+                color: "#F6F6E9",
               }}
             >
               {info.name}
@@ -142,6 +143,7 @@ function CompleteScene() {
                 margin: "0 0 10px 0",
                 fontSize: "18px",
                 fontWeight: "bold",
+                color: "#F6F6E9",
               }}
             >
               {info.title}
@@ -153,6 +155,7 @@ function CompleteScene() {
                 fontSize: "13px",
                 lineHeight: "1.5",
                 opacity: 0.95,
+                color: "#F6F6E9",
               }}
             >
               {info.description}
@@ -160,14 +163,21 @@ function CompleteScene() {
 
             <div
               style={{
-                background: "rgba(255,255,255,0.15)",
+                background: "rgba(246,246,233,0.15)", // Cream dengan transparansi
                 padding: "10px",
                 borderRadius: "6px",
                 marginBottom: "12px",
               }}
             >
               {info.specs.map((spec, idx) => (
-                <div key={idx} style={{ fontSize: "12px", margin: "3px 0" }}>
+                <div
+                  key={idx}
+                  style={{
+                    fontSize: "12px",
+                    margin: "3px 0",
+                    color: "#F6F6E9",
+                  }}
+                >
                   • {spec}
                 </div>
               ))}
@@ -181,12 +191,22 @@ function CompleteScene() {
               style={{
                 width: "100%",
                 padding: "10px",
-                background: "white",
-                color: info.color,
+                background: "#F6F6E9", // Cream background
+                color: info.color, // Text warna sesuai area
                 border: "none",
                 borderRadius: "6px",
                 cursor: "pointer",
                 fontWeight: "bold",
+                fontFamily: "var(--font-poppins), system-ui, sans-serif",
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#ffffff";
+                e.currentTarget.style.transform = "scale(1.02)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "#F6F6E9";
+                e.currentTarget.style.transform = "scale(1)";
               }}
             >
               ✕ Tutup
