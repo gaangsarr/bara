@@ -1,11 +1,13 @@
 "use client";
 
-import { Canvas, useThree, useFrame } from "@react-three/fiber"; // Tambah useThree & useFrame
+import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Environment, Html } from "@react-three/drei";
 import { Suspense, useState, useRef, useEffect } from "react";
 import type { ThreeEvent } from "@react-three/fiber";
 import type { Object3D } from "three";
+import { ErrorBoundary3D } from "@/components/ErrorBoundary3D";
 import Loader3D from "@/components/Loader3D";
+import Link from "next/link";
 
 // Type untuk area info
 type AreaInfo = {
@@ -47,16 +49,15 @@ const areaInfo: Record<AreaKey, AreaInfo> = {
 
 function CompleteScene() {
   const { scene } = useGLTF("/models/BARAPASIR-COMP.glb");
-  const { camera } = useThree(); // Ambil camera reference
+  const { camera } = useThree();
   const [selectedArea, setSelectedArea] = useState<AreaKey | null>(null);
   const [clickPosition, setClickPosition] = useState<[number, number, number]>([
     0, 0, 0,
   ]);
-  const [cameraDistance, setCameraDistance] = useState(8); // State untuk jarak kamera
+  const [cameraDistance, setCameraDistance] = useState(8);
   const groupRefs = useRef<Record<string, Object3D>>({});
 
   useEffect(() => {
-    // Find dan simpan reference ke setiap group area
     scene.traverse((child) => {
       if (
         child.name &&
@@ -70,7 +71,6 @@ function CompleteScene() {
     });
   }, [scene]);
 
-  // Update jarak kamera setiap frame
   useFrame(() => {
     const distance = camera.position.length();
     setCameraDistance(distance);
@@ -110,11 +110,7 @@ function CompleteScene() {
       <primitive object={scene} scale={0.5} position={[0, -1, 0]} />
 
       {info && (
-        <Html
-          position={clickPosition}
-          center
-          distanceFactor={4} // Fixed value (makin besar = makin kecil card)
-        >
+        <Html position={clickPosition} center distanceFactor={4}>
           <div
             style={{
               background: `linear-gradient(135deg, ${info.color} 0%, ${info.color}dd 100%)`,
@@ -204,45 +200,92 @@ function CompleteScene() {
 
 useGLTF.preload("/models/BARAPASIR-COMP.glb");
 
-function Loader() {
-  return (
-    <Html center>
-      <div style={{ color: "black", fontSize: "20px" }}>Loading...</div>
-    </Html>
-  );
-}
-
 export default function ThreeDPage() {
   return (
-    <div
-      style={{
-        width: "100vw",
-        height: "100vh",
-        background: "linear-gradient(180deg, #f0f0f0 0%, #ffffff 100%)",
-      }}
-    >
-      <Canvas
-        camera={{ position: [5, 2, 5], fov: 27 }}
-        gl={{ antialias: true, alpha: true }}
+    <ErrorBoundary3D>
+      <div
+        style={{
+          width: "100vw",
+          height: "100vh",
+          background: "linear-gradient(180deg, #f0f0f0 0%, #ffffff 100%)",
+          position: "relative",
+        }}
       >
-        <Suspense fallback={<Loader3D />}>
-          {" "}
-          {/* Ganti dari <Loader /> */}
-          <color attach="background" args={["#f8f9fa"]} />
-          <ambientLight intensity={0.8} />
-          <directionalLight position={[10, 10, 5]} intensity={1.2} />
-          <CompleteScene />
-          <Environment preset="city" />
-          <OrbitControls
-            enableZoom
-            enablePan
-            enableRotate
-            maxPolarAngle={Math.PI / 2}
-            minDistance={3}
-            maxDistance={15}
-          />
-        </Suspense>
-      </Canvas>
-    </div>
+        {/* Back Button */}
+        <Link href="/">
+          <button
+            style={{
+              position: "absolute",
+              top: "20px",
+              left: "20px",
+              zIndex: 1000,
+              padding: "12px 24px",
+              background: "linear-gradient(135deg, #005792 0%, #13334C 100%)",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontWeight: "600",
+              fontSize: "14px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              boxShadow: "0 4px 12px rgba(0, 87, 146, 0.3)",
+              transition: "all 0.3s ease",
+              fontFamily: "var(--font-poppins), system-ui, sans-serif",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow =
+                "0 6px 16px rgba(0, 87, 146, 0.4)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow =
+                "0 4px 12px rgba(0, 87, 146, 0.3)";
+            }}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Back to Home
+          </button>
+        </Link>
+
+        <Canvas
+          camera={{ position: [5, 2, 5], fov: 27 }}
+          gl={{ antialias: true, alpha: true }}
+        >
+          <Suspense fallback={<Loader3D />}>
+            <color attach="background" args={["#f8f9fa"]} />
+            <ambientLight intensity={0.8} />
+            <directionalLight position={[10, 10, 5]} intensity={1.2} />
+            <CompleteScene />
+
+            <Suspense fallback={null}>
+              <Environment preset="city" />
+            </Suspense>
+
+            <OrbitControls
+              enableZoom
+              enablePan
+              enableRotate
+              maxPolarAngle={Math.PI / 2}
+              minDistance={3}
+              maxDistance={15}
+            />
+          </Suspense>
+        </Canvas>
+      </div>
+    </ErrorBoundary3D>
   );
 }

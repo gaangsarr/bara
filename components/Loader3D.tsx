@@ -1,10 +1,8 @@
 "use client";
 
-import { Html, useProgress } from "@react-three/drei";
+import { Html } from "@react-three/drei";
 
 export default function Loader3D() {
-  const { progress } = useProgress();
-
   return (
     <Html center>
       <div
@@ -21,8 +19,8 @@ export default function Loader3D() {
           style={{
             width: "50px",
             height: "50px",
-            border: "3px solid black",
-            borderTop: "3px solid white",
+            border: "3px solid #005792",
+            borderTop: "3px solid #FD5F00",
             borderRadius: "50%",
             animation: "spin 0.8s linear infinite",
           }}
@@ -31,12 +29,13 @@ export default function Loader3D() {
         {/* Loading Text */}
         <div
           style={{
-            fontSize: "13px",
-            color: "#64748b",
-            fontFamily: "system-ui, sans-serif",
+            fontSize: "16px",
+            color: "#005792",
+            fontWeight: "600",
+            fontFamily: "var(--font-poppins), system-ui, sans-serif",
           }}
         >
-          Please wait...
+          Loading 3D Model...
         </div>
 
         <style>{`
