@@ -1,7 +1,13 @@
 "use client";
 
 import { Canvas, useThree, useFrame } from "@react-three/fiber";
-import { OrbitControls, useGLTF, Environment, Html } from "@react-three/drei";
+import {
+  OrbitControls,
+  useGLTF,
+  Environment,
+  Html,
+  useProgress,
+} from "@react-three/drei";
 import { Suspense, useState, useRef, useEffect } from "react";
 import type { ThreeEvent } from "@react-three/fiber";
 import type { Object3D } from "three";
@@ -45,7 +51,7 @@ const areaInfo: Record<AreaKey, AreaInfo> = {
   },
 };
 
-function CompleteScene({ onLoaded }: { onLoaded: () => void }) {
+function CompleteScene() {
   const { scene } = useGLTF("/models/BARAPASIR-COMP.glb");
   const { camera } = useThree();
   const [selectedArea, setSelectedArea] = useState<AreaKey | null>(null);
@@ -66,10 +72,7 @@ function CompleteScene({ onLoaded }: { onLoaded: () => void }) {
         groupRefs.current[child.name] = child;
       }
     });
-
-    // Notify parent bahwa model sudah loaded
-    onLoaded();
-  }, [scene, onLoaded]);
+  }, [scene]);
 
   useFrame(() => {
     const distance = camera.position.length();
@@ -216,8 +219,10 @@ function CompleteScene({ onLoaded }: { onLoaded: () => void }) {
   );
 }
 
-// Loader Component
+// Loader dengan Progress Bar
 function Loader3D() {
+  const { progress } = useProgress();
+
   return (
     <Html center>
       <div
@@ -225,7 +230,8 @@ function Loader3D() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: "15px",
+          gap: "20px",
+          minWidth: "200px",
         }}
       >
         <div
@@ -238,9 +244,10 @@ function Loader3D() {
             animation: "spin 0.8s linear infinite",
           }}
         />
+
         <div
           style={{
-            fontSize: "16px",
+            fontSize: "18px",
             color: "#005792",
             fontWeight: "600",
             fontFamily: "var(--font-poppins), system-ui, sans-serif",
@@ -249,6 +256,36 @@ function Loader3D() {
         >
           Loading 3D Model...
         </div>
+
+        <div
+          style={{
+            width: "200px",
+            height: "4px",
+            background: "#E0E0E0",
+            borderRadius: "2px",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              width: `${progress}%`,
+              height: "100%",
+              background: "linear-gradient(90deg, #005792 0%, #FD5F00 100%)",
+              transition: "width 0.3s ease",
+            }}
+          />
+        </div>
+
+        <div
+          style={{
+            fontSize: "14px",
+            color: "#13334C",
+            fontFamily: "var(--font-poppins), system-ui, sans-serif",
+          }}
+        >
+          {progress.toFixed(0)}%
+        </div>
+
         <style>{`
           @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -260,77 +297,12 @@ function Loader3D() {
   );
 }
 
+// Preload model
+useGLTF.preload("/models/BARAPASIR-COMP.glb");
+
 export default function ThreeDPage() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [modelLoaded, setModelLoaded] = useState(false);
-  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
-
-  useEffect(() => {
-    // Timer minimal 1 detik
-    const timer = setTimeout(() => {
-      setMinTimeElapsed(true);
-    }, 800); // 1000ms = 1 detik
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    // Loader hilang HANYA jika model sudah loaded DAN minimal 1 detik sudah lewat
-    if (modelLoaded && minTimeElapsed) {
-      setIsLoading(false);
-    }
-  }, [modelLoaded, minTimeElapsed]);
-
-  const handleModelLoaded = () => {
-    setModelLoaded(true);
-  };
-
   return (
     <ErrorBoundary3D>
-      {/* Full Screen Loader - Hilang setelah model loaded DAN minimal 1 detik */}
-      {isLoading && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "#FFFFFF",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 9999,
-          }}
-        >
-          <div
-            style={{
-              width: "70px",
-              height: "70px",
-              border: "5px solid #005792",
-              borderTop: "5px solid #FD5F00",
-              borderRadius: "50%",
-              animation: "spin 0.8s linear infinite",
-              marginBottom: "20px",
-            }}
-          />
-          <div
-            style={{
-              fontSize: "20px",
-              color: "#005792",
-              fontWeight: "600",
-              fontFamily: "var(--font-poppins), system-ui, sans-serif",
-            }}
-          >
-            Loading 3D Model...
-          </div>
-          <style>{`
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-          `}</style>
-        </div>
-      )}
-
       <div
         style={{
           width: "100vw",
@@ -393,23 +365,28 @@ export default function ThreeDPage() {
           camera={{ position: [5, 2, 5], fov: 27 }}
           gl={{ antialias: true, alpha: true }}
         >
+          <color attach="background" args={["#FFFFFF"]} />
+          <ambientLight intensity={0.8} />
+          <directionalLight position={[10, 10, 5]} intensity={1.2} />
+
+          {/* Suspense untuk Model */}
           <Suspense fallback={<Loader3D />}>
-            <color attach="background" args={["#FFFFFF"]} />
-            <ambientLight intensity={0.8} />
-            <directionalLight position={[10, 10, 5]} intensity={1.2} />
-
-            <CompleteScene onLoaded={handleModelLoaded} />
-            <Environment preset="city" />
-
-            <OrbitControls
-              enableZoom
-              enablePan
-              enableRotate
-              maxPolarAngle={Math.PI / 2}
-              minDistance={3}
-              maxDistance={15}
-            />
+            <CompleteScene />
           </Suspense>
+
+          {/* Suspense TERPISAH untuk Environment - INI FIX-NYA */}
+          <Suspense fallback={null}>
+            <Environment preset="city" />
+          </Suspense>
+
+          <OrbitControls
+            enableZoom
+            enablePan
+            enableRotate
+            maxPolarAngle={Math.PI / 2}
+            minDistance={3}
+            maxDistance={15}
+          />
         </Canvas>
       </div>
     </ErrorBoundary3D>

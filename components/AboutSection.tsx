@@ -130,25 +130,68 @@ export default function AboutSection() {
             Click on each goal to learn how BARA contributes
           </p>
 
-          {/* SDG Icons Grid */}
-          <div className="flex flex-wrap justify-center gap-4 md:gap-6">
-            {sdgGoals.map((goal) => (
-              <button
-                key={goal.number}
-                onClick={() => setSelectedSDG(goal)}
-                className="relative w-[120px] h-[120px] md:w-[150px] md:h-[150px] lg:w-[180px] lg:h-[180px] 
-                rounded-lg overflow-hidden shadow-lg hover:scale-105 hover:shadow-xl 
-                transition-all duration-300 cursor-pointer"
-                style={{ backgroundColor: goal.color }}
-              >
-                <Image
-                  src={goal.image}
-                  alt={`SDG ${goal.number}: ${goal.title}`}
-                  fill
-                  className="object-cover"
-                />
-              </button>
-            ))}
+          {/* SDG Icons Grid - LAYOUT 3-2 DI MOBILE */}
+          <div className="w-full max-w-md md:max-w-none mx-auto">
+            {/* Baris 1: 3 SDG (Mobile Only) */}
+            <div className="grid grid-cols-3 gap-3 md:hidden mb-3">
+              {sdgGoals.slice(0, 3).map((goal) => (
+                <button
+                  key={goal.number}
+                  onClick={() => setSelectedSDG(goal)}
+                  className="relative w-full aspect-square rounded-lg overflow-hidden shadow-lg 
+                  hover:scale-105 hover:shadow-xl transition-all duration-300 cursor-pointer"
+                  style={{ backgroundColor: goal.color }}
+                >
+                  <Image
+                    src={goal.image}
+                    alt={`SDG ${goal.number}: ${goal.title}`}
+                    fill
+                    className="object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+
+            {/* Baris 2: 2 SDG Center (Mobile Only) */}
+            <div className="flex justify-center gap-3 md:hidden">
+              {sdgGoals.slice(3, 5).map((goal) => (
+                <button
+                  key={goal.number}
+                  onClick={() => setSelectedSDG(goal)}
+                  className="relative w-[calc(33.333%-0.5rem)] aspect-square rounded-lg overflow-hidden 
+                  shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300 cursor-pointer"
+                  style={{ backgroundColor: goal.color }}
+                >
+                  <Image
+                    src={goal.image}
+                    alt={`SDG ${goal.number}: ${goal.title}`}
+                    fill
+                    className="object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+
+            {/* Desktop: All in one row */}
+            <div className="hidden md:flex md:flex-wrap md:justify-center md:gap-6">
+              {sdgGoals.map((goal) => (
+                <button
+                  key={goal.number}
+                  onClick={() => setSelectedSDG(goal)}
+                  className="relative w-[150px] h-[150px] lg:w-[180px] lg:h-[180px] 
+                  rounded-lg overflow-hidden shadow-lg hover:scale-105 hover:shadow-xl 
+                  transition-all duration-300 cursor-pointer"
+                  style={{ backgroundColor: goal.color }}
+                >
+                  <Image
+                    src={goal.image}
+                    alt={`SDG ${goal.number}: ${goal.title}`}
+                    fill
+                    className="object-cover"
+                  />
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
