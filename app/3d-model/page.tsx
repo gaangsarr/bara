@@ -513,7 +513,7 @@ function TutorialModal({ onClose }: { onClose: () => void }) {
                 "0 4px 12px rgba(253, 95, 0, 0.3)";
             }}
           >
-            Mulai
+            Mulaii
           </button>
         </div>
       </div>
