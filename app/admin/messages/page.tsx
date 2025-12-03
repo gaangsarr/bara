@@ -1,20 +1,26 @@
-import { getDatabase } from "@/lib/mongodb";
-import { ContactMessage } from "@/types/contact";
+import dbConnect from "@/lib/mongoose";
+import Contact from "@/lib/models/Contact";
 
 // Force dynamic rendering
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function MessagesPage() {
-  // Fetch messages dari MongoDB
-  const db = await getDatabase();
-  const collection = db.collection<ContactMessage>("contacts");
+  // Connect to MongoDB
+  await dbConnect();
 
-  const messages = await collection
-    .find({})
+  // Fetch messages
+  const messages = await Contact.find({})
     .sort({ createdAt: -1 })
     .limit(50)
-    .toArray();
+    .lean(); // Use lean() for better performance
+
+  // Convert to plain objects with string IDs
+  const messagesData = messages.map((msg) => ({
+    ...msg,
+    _id: msg._id.toString(),
+    createdAt: msg.createdAt.toISOString(),
+  }));
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -51,7 +57,7 @@ export default async function MessagesPage() {
                   Total Messages
                 </p>
                 <p className="text-2xl font-semibold text-gray-900">
-                  {messages.length}
+                  {messagesData.length}
                 </p>
               </div>
             </div>
@@ -79,7 +85,7 @@ export default async function MessagesPage() {
                   New Messages
                 </p>
                 <p className="text-2xl font-semibold text-gray-900">
-                  {messages.filter((m) => m.status === "new").length}
+                  {messagesData.filter((m) => m.status === "new").length}
                 </p>
               </div>
             </div>
@@ -106,7 +112,7 @@ export default async function MessagesPage() {
                 <p className="text-sm font-medium text-gray-500">Today</p>
                 <p className="text-2xl font-semibold text-gray-900">
                   {
-                    messages.filter((m) => {
+                    messagesData.filter((m) => {
                       const today = new Date();
                       const msgDate = new Date(m.createdAt);
                       return msgDate.toDateString() === today.toDateString();
@@ -127,7 +133,7 @@ export default async function MessagesPage() {
           </div>
 
           <div className="divide-y divide-gray-200">
-            {messages.length === 0 ? (
+            {messagesData.length === 0 ? (
               <div className="px-6 py-12 text-center text-gray-500">
                 <svg
                   className="mx-auto h-12 w-12 text-gray-400 mb-4"
@@ -145,9 +151,9 @@ export default async function MessagesPage() {
                 <p>Belum ada pesan masuk</p>
               </div>
             ) : (
-              messages.map((msg) => (
+              messagesData.map((msg) => (
                 <div
-                  key={msg._id?.toString()}
+                  key={msg._id}
                   className="px-6 py-5 hover:bg-gray-50 transition-colors"
                 >
                   <div className="flex justify-between items-start mb-3">

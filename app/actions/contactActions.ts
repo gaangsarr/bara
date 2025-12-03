@@ -1,10 +1,12 @@
 "use server";
 
-import { getDatabase } from "@/lib/mongodb";
+import dbConnect from "@/lib/mongoose";
+import Contact from "@/lib/models/Contact";
 import { revalidatePath } from "next/cache";
-import { ContactMessage } from "@/types/contact";
 
 export async function submitContactForm(formData: FormData) {
+  console.log("🚀 Server Action called");
+
   try {
     // Extract data dari form
     const name = formData.get("name") as string;
@@ -12,8 +14,11 @@ export async function submitContactForm(formData: FormData) {
     const subject = formData.get("subject") as string;
     const message = formData.get("message") as string;
 
+    console.log("📝 Form data received:", { name, email, subject });
+
     // Validasi basic
     if (!name || !email || !message) {
+      console.error("❌ Validation failed: Missing fields");
       return {
         success: false,
         error: "Semua field wajib diisi!",
@@ -23,41 +28,52 @@ export async function submitContactForm(formData: FormData) {
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
+      console.error("❌ Validation failed: Invalid email");
       return {
         success: false,
         error: "Email tidak valid!",
       };
     }
 
-    // Connect ke MongoDB
-    const db = await getDatabase();
-    const collection = db.collection<ContactMessage>("contacts");
+    console.log("✅ Validation passed");
 
-    // Insert data
-    const contactData: ContactMessage = {
+    // Connect to MongoDB
+    console.log("🔌 Connecting to MongoDB...");
+    await dbConnect();
+
+    // Create new contact
+    const contact = await Contact.create({
       name: name.trim(),
       email: email.trim().toLowerCase(),
       subject: subject?.trim() || "",
       message: message.trim(),
-      createdAt: new Date(),
       status: "new",
-    };
+    });
 
-    const result = await collection.insertOne(contactData as any);
+    console.log("✅ Contact saved successfully. ID:", contact._id);
 
-    // Optional: Revalidate path jika ada halaman yang display messages
+    // Revalidate path
     revalidatePath("/contact");
+    revalidatePath("/admin/messages");
 
     return {
       success: true,
       message: "Pesan berhasil dikirim! Kami akan segera menghubungi Anda.",
-      id: result.insertedId.toString(),
+      id: contact._id.toString(),
     };
   } catch (error) {
-    console.error("Error submitting contact form:", error);
+    console.error("❌ Error in submitContactForm:", error);
+    console.error("Error details:", {
+      name: error instanceof Error ? error.name : "Unknown",
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+
     return {
       success: false,
-      error: "Terjadi kesalahan. Silakan coba lagi.",
+      error: `Terjadi kesalahan: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`,
     };
   }
 }
