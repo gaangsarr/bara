@@ -60,7 +60,7 @@ export default function ContactForm() {
           required
           disabled={isPending}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-          placeholder="John Doe"
+          placeholder="Gangsar Anjasmoro"
         />
       </div>
 
@@ -79,7 +79,7 @@ export default function ContactForm() {
           required
           disabled={isPending}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-          placeholder="john@example.com"
+          placeholder="gangsar2431170@itpln.ac.id"
         />
       </div>
 
