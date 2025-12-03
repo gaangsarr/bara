@@ -1,17 +1,21 @@
 import { MongoClient, Db } from "mongodb";
 
-if (!process.env.MONGODB_URI) {
-  throw new Error("Please add your Mongo URI to .env.local");
+const uri = process.env.MONGODB_URI || "";
+
+if (!uri && process.env.NODE_ENV !== "production") {
+  console.warn("⚠️ MONGODB_URI not found");
 }
 
-const uri = process.env.MONGODB_URI;
-const options = {};
+const options = {
+  maxPoolSize: 10,
+  minPoolSize: 2,
+};
 
 let client: MongoClient;
 let clientPromise: Promise<MongoClient>;
 
-// Untuk development - prevent connection overload saat hot reload
 if (process.env.NODE_ENV === "development") {
+  // Development with global caching
   let globalWithMongo = global as typeof globalThis & {
     _mongoClientPromise?: Promise<MongoClient>;
   };
@@ -22,12 +26,16 @@ if (process.env.NODE_ENV === "development") {
   }
   clientPromise = globalWithMongo._mongoClientPromise;
 } else {
-  // Untuk production
+  // Production
   client = new MongoClient(uri, options);
   clientPromise = client.connect();
 }
 
 export async function getDatabase(): Promise<Db> {
+  if (!process.env.MONGODB_URI) {
+    throw new Error("MONGODB_URI is not defined");
+  }
+
   const client = await clientPromise;
   return client.db(process.env.MONGODB_DB || "baraapp");
 }
