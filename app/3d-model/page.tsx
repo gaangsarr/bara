@@ -13,6 +13,7 @@ import type { ThreeEvent } from "@react-three/fiber";
 import type { Object3D } from "three";
 import { ErrorBoundary3D } from "@/components/ErrorBoundary3D";
 import Link from "next/link";
+import * as THREE from "three";
 
 // Type untuk area info
 type AreaInfo = {
@@ -51,6 +52,87 @@ const areaInfo: Record<AreaKey, AreaInfo> = {
   },
 };
 
+// Cinematic Camera Controller
+function CinematicCamera({ onComplete }: { onComplete: () => void }) {
+  const { camera } = useThree();
+  const [cinematicTime, setCinematicTime] = useState(0);
+  const cinematicDuration = 18;
+  const hasCompleted = useRef(false);
+
+  useFrame((state, delta) => {
+    if (cinematicTime < cinematicDuration) {
+      const t = cinematicTime / cinematicDuration;
+
+      const easeInOut =
+        t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+      const keyframes = [
+        { pos: [8.8, 6.7, 7.9], lookAt: [0, 0, 0], time: 0 },
+        { pos: [-0.2, 0.9, 4.6], lookAt: [-2, 0, 0], time: 0.2 },
+        { pos: [5, 1, 3], lookAt: [0, 0, 0], time: 0.4 },
+        { pos: [6, 1, -1], lookAt: [2, 0, -1], time: 0.55 },
+        { pos: [-9.5, 3.2, -10.5], lookAt: [0, 0, 0], time: 0.75 },
+        { pos: [-9.5, 3.2, -10.5], lookAt: [0, 0, 0], time: 0.85 },
+        { pos: [5, 2, 5], lookAt: [0, 0, 0], time: 1.0 },
+      ];
+
+      let current = keyframes[0];
+      let next = keyframes[1];
+
+      for (let i = 0; i < keyframes.length - 1; i++) {
+        if (
+          easeInOut >= keyframes[i].time &&
+          easeInOut <= keyframes[i + 1].time
+        ) {
+          current = keyframes[i];
+          next = keyframes[i + 1];
+          break;
+        }
+      }
+
+      const segmentProgress =
+        (easeInOut - current.time) / (next.time - current.time);
+
+      const smoothProgress =
+        segmentProgress < 0.5
+          ? 2 * segmentProgress * segmentProgress
+          : 1 - Math.pow(-2 * segmentProgress + 2, 2) / 2;
+
+      camera.position.x = THREE.MathUtils.lerp(
+        current.pos[0],
+        next.pos[0],
+        smoothProgress
+      );
+      camera.position.y = THREE.MathUtils.lerp(
+        current.pos[1],
+        next.pos[1],
+        smoothProgress
+      );
+      camera.position.z = THREE.MathUtils.lerp(
+        current.pos[2],
+        next.pos[2],
+        smoothProgress
+      );
+
+      const lookAtTarget = new THREE.Vector3(
+        THREE.MathUtils.lerp(current.lookAt[0], next.lookAt[0], smoothProgress),
+        THREE.MathUtils.lerp(current.lookAt[1], next.lookAt[1], smoothProgress),
+        THREE.MathUtils.lerp(current.lookAt[2], next.lookAt[2], smoothProgress)
+      );
+
+      camera.lookAt(lookAtTarget);
+      camera.updateProjectionMatrix();
+
+      setCinematicTime(cinematicTime + delta);
+    } else if (!hasCompleted.current) {
+      hasCompleted.current = true;
+      onComplete();
+    }
+  });
+
+  return null;
+}
+
 function CompleteScene() {
   const { scene } = useGLTF("/models/BARA3-COMP.glb");
   const { camera } = useThree();
@@ -58,7 +140,6 @@ function CompleteScene() {
   const [clickPosition, setClickPosition] = useState<[number, number, number]>([
     0, 0, 0,
   ]);
-  const [cameraDistance, setCameraDistance] = useState(8);
   const groupRefs = useRef<Record<string, Object3D>>({});
 
   useEffect(() => {
@@ -73,11 +154,6 @@ function CompleteScene() {
       }
     });
   }, [scene]);
-
-  useFrame(() => {
-    const distance = camera.position.length();
-    setCameraDistance(distance);
-  });
 
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
@@ -224,7 +300,7 @@ function Loader3D() {
   const { progress } = useProgress();
 
   return (
-    <Html center>
+    <Html center style={{ zIndex: 100 }}>
       <div
         style={{
           display: "flex",
@@ -329,7 +405,6 @@ function TutorialModal({ onClose }: { onClose: () => void }) {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div
           style={{
             background: "linear-gradient(135deg, #005792 0%, #13334C 100%)",
@@ -347,7 +422,6 @@ function TutorialModal({ onClose }: { onClose: () => void }) {
           </p>
         </div>
 
-        {/* Device Warning */}
         <div
           style={{
             background: "#FFF3CD",
@@ -380,7 +454,6 @@ function TutorialModal({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        {/* Device Toggle */}
         <div
           style={{
             display: "flex",
@@ -423,10 +496,8 @@ function TutorialModal({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        {/* Controls Tutorial */}
         <div style={{ padding: "0 30px 30px 30px" }}>
           {deviceType === "mobile" ? (
-            // Mobile Controls dengan Custom Icon
             <div
               style={{
                 display: "grid",
@@ -435,23 +506,22 @@ function TutorialModal({ onClose }: { onClose: () => void }) {
               }}
             >
               <ControlCard
-                iconSrc="/assets/spin.png"
+                iconSrc="/assets/spin-min.png"
                 title="Memutar Kamera"
                 description="Geser dengan satu jari untuk memutar model"
               />
               <ControlCard
-                iconSrc="/assets/move.png"
+                iconSrc="/assets/move-min.png"
                 title="Memindah Kamera"
                 description="Geser dengan dua jari untuk memindahkan posisi kamera"
               />
               <ControlCard
-                iconSrc="/assets/zoom.png"
+                iconSrc="/assets/zoom-min.png"
                 title="Mengatur Jarak Kamera"
                 description="Pinch (cubit) untuk zoom in/out"
               />
             </div>
           ) : (
-            // Desktop Controls dengan Custom Icon
             <div
               style={{
                 display: "grid",
@@ -460,17 +530,17 @@ function TutorialModal({ onClose }: { onClose: () => void }) {
               }}
             >
               <ControlCard
-                iconSrc="/assets/mouse.png"
+                iconSrc="/assets/mouse-min.png"
                 title="Memutar Kamera"
                 description="Klik kiri + drag untuk memutar model"
               />
               <ControlCard
-                iconSrc="/assets/mouse.png"
+                iconSrc="/assets/mouse-min.png"
                 title="Memindah Kamera"
                 description="Klik kanan + drag untuk pan kamera"
               />
               <ControlCard
-                iconSrc="/assets/zoom.png"
+                iconSrc="/assets/zoom-min.png"
                 title="Zoom In/Out"
                 description="Scroll mouse wheel untuk zoom"
               />
@@ -478,7 +548,6 @@ function TutorialModal({ onClose }: { onClose: () => void }) {
           )}
         </div>
 
-        {/* Footer Buttons */}
         <div
           style={{
             padding: "20px 30px",
@@ -521,7 +590,6 @@ function TutorialModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-// Control Card Component - CENTERED IMAGE
 function ControlCard({
   iconSrc,
   title,
@@ -542,14 +610,13 @@ function ControlCard({
         transition: "all 0.2s",
       }}
     >
-      {/* Custom Image Icon - CENTERED */}
       <div
         style={{
           marginBottom: "12px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          height: "80px", // Fixed height untuk alignment konsisten
+          height: "80px",
         }}
       >
         <img
@@ -559,7 +626,7 @@ function ControlCard({
             width: "80px",
             height: "80px",
             objectFit: "contain",
-            display: "block", // Remove inline spacing
+            display: "block",
           }}
         />
       </div>
@@ -580,16 +647,114 @@ function ControlCard({
   );
 }
 
-// Preload model
 useGLTF.preload("/models/BARA3-COMP.glb");
 
 export default function ThreeDPage() {
-  const [showTutorial, setShowTutorial] = useState(true);
+  const [showTutorial, setShowTutorial] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [cinematicComplete, setCinematicComplete] = useState(false);
+  const [showSkipButton, setShowSkipButton] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const orbitControlsRef = useRef<any>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (isLoaded) {
+      const timer = setTimeout(() => {
+        setShowTutorial(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoaded]);
+
+  useEffect(() => {
+    if (isLoaded && !cinematicComplete) {
+      const timer = setTimeout(() => {
+        setShowSkipButton(true);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoaded, cinematicComplete]);
+
+  // Initialize audio - FIX VERSION
+  useEffect(() => {
+    // Create audio element
+    const audio = new Audio("/assets/bg-music2.mp3");
+    audio.loop = true;
+    audio.volume = 0.5;
+    audioRef.current = audio;
+
+    // Try autoplay dengan error handling
+    const attemptAutoplay = async () => {
+      try {
+        await audio.play();
+        setIsPlaying(true);
+        console.log("✅ Audio autoplay SUCCESS!");
+      } catch (error) {
+        console.log("❌ Autoplay blocked, waiting for user interaction...");
+        setIsPlaying(false);
+
+        // Backup: Play on first user click/touch
+        const playOnInteraction = async () => {
+          try {
+            await audio.play();
+            setIsPlaying(true);
+            console.log("✅ Audio started after user interaction");
+            // Remove listener after successful play
+            document.removeEventListener("click", playOnInteraction);
+            document.removeEventListener("touchstart", playOnInteraction);
+          } catch (err) {
+            console.log("Still blocked:", err);
+          }
+        };
+
+        document.addEventListener("click", playOnInteraction, { once: true });
+        document.addEventListener("touchstart", playOnInteraction, {
+          once: true,
+        });
+      }
+    };
+
+    attemptAutoplay();
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  const handleSkipCinematic = () => {
+    setCinematicComplete(true);
+    setShowSkipButton(false);
+  };
+
+  const handleCinematicComplete = () => {
+    setCinematicComplete(true);
+    setShowSkipButton(false);
+  };
+
+  const toggleAudio = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        audioRef.current
+          .play()
+          .then(() => {
+            setIsPlaying(true);
+          })
+          .catch((err) => {
+            console.log("Play failed:", err);
+          });
+      }
+    }
+  };
 
   return (
     <ErrorBoundary3D>
-      {/* Tutorial Modal - Muncul setelah loading selesai */}
       {showTutorial && isLoaded && (
         <TutorialModal onClose={() => setShowTutorial(false)} />
       )}
@@ -652,8 +817,49 @@ export default function ThreeDPage() {
           </button>
         </Link>
 
-        {/* Help Button - Buka tutorial lagi */}
-        {!showTutorial && isLoaded && (
+        {/* Skip Button */}
+        {showSkipButton && !cinematicComplete && (
+          <button
+            onClick={handleSkipCinematic}
+            style={{
+              position: "absolute",
+              bottom: "40px",
+              right: "40px",
+              zIndex: 1000,
+              padding: "12px 24px",
+              background: "rgba(0, 0, 0, 0.7)",
+              color: "white",
+              border: "2px solid rgba(255, 255, 255, 0.3)",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontWeight: "600",
+              fontSize: "14px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              backdropFilter: "blur(10px)",
+              transition: "all 0.3s ease",
+              fontFamily: "var(--font-poppins), system-ui, sans-serif",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(0, 0, 0, 0.9)";
+              e.currentTarget.style.transform = "translateY(-2px)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "rgba(0, 0, 0, 0.7)";
+              e.currentTarget.style.transform = "translateY(0)";
+            }}
+          >
+            Skip Intro
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 4l12 8-12 8V4z" />
+              <path d="M18 4h2v16h-2V4z" />
+            </svg>
+          </button>
+        )}
+
+        {/* Help Button */}
+        {!showTutorial && (
           <button
             onClick={() => setShowTutorial(true)}
             style={{
@@ -689,26 +895,76 @@ export default function ThreeDPage() {
           </button>
         )}
 
+        {/* Audio Button */}
+        <button
+          onClick={toggleAudio}
+          style={{
+            position: "absolute",
+            top: "80px",
+            right: "20px",
+            zIndex: 1000,
+            padding: "12px",
+            background: isPlaying ? "#00A3E0" : "#666",
+            color: "white",
+            border: "none",
+            borderRadius: "50%",
+            cursor: "pointer",
+            width: "48px",
+            height: "48px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+            transition: "all 0.3s ease",
+            fontFamily: "var(--font-poppins), system-ui, sans-serif",
+            fontSize: "20px",
+          }}
+          title={isPlaying ? "Pause Music" : "Play Music"}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "scale(1.1)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "scale(1)";
+          }}
+        >
+          {isPlaying ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16" />
+              <rect x="14" y="4" width="4" height="16" />
+            </svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          )}
+        </button>
+
         <Canvas
-          camera={{ position: [5, 2, 5], fov: 27 }}
+          camera={{ position: [8, 4, 8], fov: 27 }}
           gl={{ antialias: true, alpha: true }}
-          onCreated={() => setIsLoaded(true)}
+          onCreated={() => {
+            setTimeout(() => setIsLoaded(true), 200);
+          }}
         >
           <color attach="background" args={["#FFFFFF"]} />
           <ambientLight intensity={0.8} />
           <directionalLight position={[10, 10, 5]} intensity={1.2} />
 
-          {/* Suspense untuk Model */}
           <Suspense fallback={<Loader3D />}>
             <CompleteScene />
           </Suspense>
 
-          {/* Suspense TERPISAH untuk Environment */}
           <Suspense fallback={null}>
             <Environment preset="city" />
           </Suspense>
 
+          {isLoaded && !cinematicComplete && (
+            <CinematicCamera onComplete={handleCinematicComplete} />
+          )}
+
           <OrbitControls
+            ref={orbitControlsRef}
+            enabled={cinematicComplete}
             enableZoom
             enablePan
             enableRotate
