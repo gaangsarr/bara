@@ -52,7 +52,7 @@ const areaInfo: Record<AreaKey, AreaInfo> = {
 };
 
 function CompleteScene() {
-  const { scene } = useGLTF("/models/BARAPASIR-COMP.glb");
+  const { scene } = useGLTF("/models/BARA3-COMP.glb");
   const { camera } = useThree();
   const [selectedArea, setSelectedArea] = useState<AreaKey | null>(null);
   const [clickPosition, setClickPosition] = useState<[number, number, number]>([
@@ -513,7 +513,7 @@ function TutorialModal({ onClose }: { onClose: () => void }) {
                 "0 4px 12px rgba(253, 95, 0, 0.3)";
             }}
           >
-            Mulaii
+            Mulai
           </button>
         </div>
       </div>
@@ -581,7 +581,7 @@ function ControlCard({
 }
 
 // Preload model
-useGLTF.preload("/models/BARAPASIR-COMP.glb");
+useGLTF.preload("/models/BARA3-COMP.glb");
 
 export default function ThreeDPage() {
   const [showTutorial, setShowTutorial] = useState(true);
