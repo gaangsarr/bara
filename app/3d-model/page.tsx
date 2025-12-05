@@ -144,7 +144,7 @@ function CinematicCamera({ onComplete }: { onComplete: () => void }) {
 }
 
 function CompleteScene() {
-  const { scene } = useGLTF("/models/BARA333.glb");
+  const { scene } = useGLTF("/models/BARAMTHR-COMP.glb");
   const { camera } = useThree();
   const [selectedArea, setSelectedArea] = useState<AreaKey | null>(null);
   const [clickPosition, setClickPosition] = useState<[number, number, number]>([
@@ -657,7 +657,7 @@ function ControlCard({
   );
 }
 
-useGLTF.preload("/models/BARA333.glb");
+useGLTF.preload("/models/BARAMTHR-COMP.glb");
 
 export default function ThreeDPage() {
   const [showTutorial, setShowTutorial] = useState(false);
