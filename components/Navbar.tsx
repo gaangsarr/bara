@@ -22,13 +22,13 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="sticky top-0 z-50 w-full bg-linear-to-r from-[#13334C] to-[#005792] px-8 py-4 shadow-lg">
+      <nav className="sticky top-0 z-50 w-full bg-linear-to-r from-[#13334C] to-[#005792] px-8 shadow-lg">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center z-50">
-            <div className="relative w-[5%] min-w-10 max-w-[60px] aspect-1277/1952 transition-transform duration-300 ease-in-out hover:scale-110">
+            <div className="relative w-[90%] min-w-14 max-w-[60px] aspect-1277/1952 transition-transform duration-300 ease-in-out hover:scale-110">
               <Image
-                src="/logo.png"
+                src="/LOGO-BARA.png"
                 alt="Logo"
                 fill
                 className="object-contain"

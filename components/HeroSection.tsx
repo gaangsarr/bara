@@ -104,7 +104,7 @@ export default function HeroSection() {
         >
           <Link href="/3d-model">
             <Image
-              src="/bgHero2.png"
+              src="/BGHEROFINAL-min.png"
               alt="Coastal Resilience Engine System"
               width={1920}
               height={1080}
@@ -138,7 +138,7 @@ export default function HeroSection() {
             >
               <Link href="/3d-model">
                 <Image
-                  src="/bgHero2.png"
+                  src="/BGHEROFINAL-min.png"
                   alt="Coastal Resilience Engine System"
                   width={1920}
                   height={1080}

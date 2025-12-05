@@ -71,10 +71,10 @@ function CinematicCamera({ onComplete }: { onComplete: () => void }) {
         { pos: [8.8, 6.7, 7.9], lookAt: [0, 0, 0], time: 0 },
 
         // 2. LEFT Area (5-10 detik)
-        { pos: [3.2, 1.1, 6.7], lookAt: [0.3, 0.4, 2.7], time: 0.2 },
+        { pos: [3.3, 0.9, 6.8], lookAt: [0.2, 0.3, 2.8], time: 0.2 },
 
         // 3. CENTER Area (10-15 detik)
-        { pos: [5.2, 0.8, 4.3], lookAt: [1.3, -0.4, 0.7], time: 0.4 },
+        { pos: [5.7, 0.1, 4.8], lookAt: [1, -0.3, 0.7], time: 0.4 },
 
         // 4. RIGHT Area (15-20 detik)
         { pos: [4.9, 0.4, 2.6], lookAt: [0.8, -0.5, -2], time: 0.6 },
@@ -83,7 +83,7 @@ function CinematicCamera({ onComplete }: { onComplete: () => void }) {
         { pos: [-7.2, 2.5, -7.9], lookAt: [0.6, -0.2, 0.7], time: 0.8 },
 
         // 6. Final Overview (22.5-25 detik)
-        { pos: [8.2, 2.5, 7.0], lookAt: [4.5, 1.2, 3.8], time: 1.0 },
+        { pos: [8, 4, 8], lookAt: [0, 0, 0], time: 1.0 },
       ];
 
       let current = keyframes[0];
@@ -144,7 +144,7 @@ function CinematicCamera({ onComplete }: { onComplete: () => void }) {
 }
 
 function CompleteScene() {
-  const { scene } = useGLTF("/models/BARAMTHR-COMP.glb");
+  const { scene } = useGLTF("/models/BARA3D-4MB.glb");
   const { camera } = useThree();
   const [selectedArea, setSelectedArea] = useState<AreaKey | null>(null);
   const [clickPosition, setClickPosition] = useState<[number, number, number]>([
@@ -328,83 +328,76 @@ function TutorialModal({ onClose }: { onClose: () => void }) {
         style={{
           background: "white",
           borderRadius: "20px",
-          maxWidth: "900px",
           width: "100%",
-          maxHeight: "90vh",
-          overflow: "auto",
-          position: "relative",
+          maxWidth: "400px", // ← Smaller maxWidth
+          maxHeight: "85vh", // ← Slightly smaller
+          overflow: "hidden", // ← No scroll
           fontFamily: "var(--font-poppins), system-ui, sans-serif",
+          position: "relative",
         }}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Header */}
         <div
           style={{
             background: "linear-gradient(135deg, #005792 0%, #13334C 100%)",
-            padding: "30px",
-            borderRadius: "20px 20px 0 0",
+            padding: "24px 20px",
             color: "white",
-            position: "relative",
           }}
         >
-          <h2 style={{ margin: 0, fontSize: "28px", fontWeight: "bold" }}>
+          <h2 style={{ margin: 0, fontSize: "24px", fontWeight: "bold" }}>
             Petunjuk Navigasi
           </h2>
-          <p style={{ margin: "8px 0 0 0", opacity: 0.9, fontSize: "14px" }}>
+          <p style={{ margin: "4px 0 0 0", opacity: 0.9, fontSize: "13px" }}>
             Pelajari cara menggunakan model 3D interaktif
           </p>
         </div>
 
+        {/* Rekomendasi Perangkat */}
         <div
           style={{
             background: "#FFF3CD",
-            border: "2px solid #FFC107",
-            borderRadius: "12px",
-            padding: "16px 20px",
-            margin: "20px 30px",
+            border: "1px solid #FFC107",
+            borderRadius: "8px",
+            padding: "12px 16px",
+            margin: "16px",
             display: "flex",
             alignItems: "start",
-            gap: "12px",
+            gap: "8px",
           }}
         >
-          <div>
-            <div
-              style={{
-                fontWeight: "600",
-                color: "#856404",
-                marginBottom: "4px",
-              }}
-            >
-              Rekomendasi Perangkat
+          <div style={{ fontSize: "12px", lineHeight: "1.4" }}>
+            <div style={{ fontWeight: "600", color: "#856404" }}>
+              Rekomendasi
             </div>
-            <div
-              style={{ fontSize: "14px", color: "#856404", lineHeight: "1.5" }}
-            >
-              Untuk pengalaman terbaik, gunakan{" "}
-              <strong>Laptop atau Desktop</strong> dengan mouse untuk kontrol
-              yang lebih presisi dan performa optimal.
+            <div style={{ color: "#856404" }}>
+              Gunakan <strong>Laptop/Desktop</strong> untuk pengalaman terbaik
             </div>
           </div>
         </div>
 
+        {/* Device Switcher */}
         <div
           style={{
             display: "flex",
-            gap: "12px",
-            margin: "20px 30px",
+            gap: "8px",
+            padding: "0 16px",
             justifyContent: "center",
+            marginBottom: "12px",
           }}
         >
           <button
             onClick={() => setDeviceType("mobile")}
             style={{
-              padding: "12px 32px",
-              borderRadius: "12px",
+              flex: 1,
+              padding: "10px 8px",
+              borderRadius: "10px",
               border: "2px solid #005792",
               background: deviceType === "mobile" ? "#005792" : "white",
               color: deviceType === "mobile" ? "white" : "#005792",
               fontWeight: "600",
               cursor: "pointer",
-              fontSize: "14px",
+              fontSize: "13px",
               transition: "all 0.2s",
             }}
           >
@@ -413,14 +406,15 @@ function TutorialModal({ onClose }: { onClose: () => void }) {
           <button
             onClick={() => setDeviceType("desktop")}
             style={{
-              padding: "12px 32px",
-              borderRadius: "12px",
+              flex: 1,
+              padding: "10px 8px",
+              borderRadius: "10px",
               border: "2px solid #005792",
               background: deviceType === "desktop" ? "#005792" : "white",
               color: deviceType === "desktop" ? "white" : "#005792",
               fontWeight: "600",
               cursor: "pointer",
-              fontSize: "14px",
+              fontSize: "13px",
               transition: "all 0.2s",
             }}
           >
@@ -428,71 +422,68 @@ function TutorialModal({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        <div style={{ padding: "0 30px 30px 30px" }}>
-          {deviceType === "mobile" ? (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-                gap: "20px",
-              }}
-            >
-              <ControlCard
-                iconSrc="/assets/spin-min.png"
-                title="Memutar Kamera"
-                description="Geser dengan satu jari untuk memutar model"
-              />
-              <ControlCard
-                iconSrc="/assets/move-min.png"
-                title="Memindah Kamera"
-                description="Geser dengan dua jari untuk memindahkan posisi kamera"
-              />
-              <ControlCard
-                iconSrc="/assets/zoom-min.png"
-                title="Mengatur Jarak Kamera"
-                description="Pinch (cubit) untuk zoom in/out"
-              />
-            </div>
-          ) : (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-                gap: "20px",
-              }}
-            >
-              <ControlCard
-                iconSrc="/assets/mouse-min.png"
-                title="Memutar Kamera"
-                description="Klik kiri + drag untuk memutar model"
-              />
-              <ControlCard
-                iconSrc="/assets/mouse-min.png"
-                title="Memindah Kamera"
-                description="Klik kanan + drag untuk pan kamera"
-              />
-              <ControlCard
-                iconSrc="/assets/zoom-min.png"
-                title="Zoom In/Out"
-                description="Scroll mouse wheel untuk zoom"
-              />
-            </div>
-          )}
+        {/* Controls - Compact Grid */}
+        <div style={{ padding: "0 16px 24px 16px" }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr", // ← 2 kolom mobile
+              gap: "12px",
+            }}
+          >
+            {deviceType === "mobile" ? (
+              <>
+                <ControlCardCompact
+                  iconSrc="/assets/spin-min.png"
+                  title="Putar"
+                  description="1 jari geser"
+                />
+                <ControlCardCompact
+                  iconSrc="/assets/move-min.png"
+                  title="Pindah"
+                  description="2 jari geser"
+                />
+                <ControlCardCompact
+                  iconSrc="/assets/zoom-min.png"
+                  title="Zoom"
+                  description="Pinch cubit"
+                />
+              </>
+            ) : (
+              <>
+                <ControlCardCompact
+                  iconSrc="/assets/mouse-min.png"
+                  title="Putar"
+                  description="Kiri + drag"
+                />
+                <ControlCardCompact
+                  iconSrc="/assets/mouse-min.png"
+                  title="Pindah"
+                  description="Kanan + drag"
+                />
+                <ControlCardCompact
+                  iconSrc="/assets/zoom-min.png"
+                  title="Zoom"
+                  description="Scroll wheel"
+                />
+              </>
+            )}
+          </div>
         </div>
 
+        {/* Mulai Button - Fixed Position */}
         <div
           style={{
-            padding: "20px 30px",
+            padding: "16px 20px",
+            background: "white",
             borderTop: "1px solid #E0E0E0",
-            display: "flex",
-            gap: "12px",
-            justifyContent: "flex-end",
           }}
         >
           <button
             onClick={onClose}
             style={{
-              padding: "12px 32px",
+              width: "100%",
+              padding: "14px 20px",
               borderRadius: "12px",
               border: "none",
               background: "linear-gradient(135deg, #FD5F00 0%, #FF8A3D 100%)",
@@ -514,7 +505,7 @@ function TutorialModal({ onClose }: { onClose: () => void }) {
                 "0 4px 12px rgba(253, 95, 0, 0.3)";
             }}
           >
-            Mulai
+            Mulai Pengalaman 3D
           </button>
         </div>
       </div>
@@ -522,7 +513,8 @@ function TutorialModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-function ControlCard({
+// Compact Control Card untuk mobile
+function ControlCardCompact({
   iconSrc,
   title,
   description,
@@ -536,50 +528,42 @@ function ControlCard({
       style={{
         background: "#F8F9FA",
         borderRadius: "12px",
-        padding: "20px",
+        padding: "12px",
         textAlign: "center",
-        border: "2px solid #E0E0E0",
+        border: "1px solid #E0E0E0",
         transition: "all 0.2s",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "6px",
       }}
     >
-      <div
+      <img
+        src={iconSrc}
+        alt={title}
         style={{
-          marginBottom: "12px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "80px",
+          width: "40px",
+          height: "40px",
+          objectFit: "contain",
         }}
-      >
-        <img
-          src={iconSrc}
-          alt={title}
-          style={{
-            width: "80px",
-            height: "80px",
-            objectFit: "contain",
-            display: "block",
-          }}
-        />
-      </div>
+      />
       <div
         style={{
           fontWeight: "600",
           color: "#005792",
-          marginBottom: "8px",
-          fontSize: "16px",
+          fontSize: "14px",
         }}
       >
         {title}
       </div>
-      <div style={{ fontSize: "13px", color: "#666", lineHeight: "1.5" }}>
+      <div style={{ fontSize: "11px", color: "#666", lineHeight: "1.3" }}>
         {description}
       </div>
     </div>
   );
 }
 
-useGLTF.preload("/models/BARAMTHR-COMP.glb");
+useGLTF.preload("/models/BARA3D-4MB.glb");
 function PageLoader({ onLoaded }: { onLoaded: () => void }) {
   const { progress, active } = useProgress();
 
@@ -783,10 +767,10 @@ export default function ThreeDPage() {
           <button
             onClick={handleSkipCinematic}
             style={{
-              position: "absolute",
-              bottom: "40px",
-              right: "40px",
-              zIndex: 1000,
+              position: "fixed", // ← Ubah ke fixed, bukan absolute
+              bottom: "24px", // ← Naikkan dari 40px ke 24px
+              right: "24px", // ← Sedikit lebih kecil margin
+              zIndex: 1001, // ← Lebih tinggi dari canvas
               padding: "12px 24px",
               background: "rgba(0, 0, 0, 0.7)",
               color: "white",
