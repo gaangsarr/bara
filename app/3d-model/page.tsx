@@ -305,84 +305,6 @@ function CompleteScene() {
   );
 }
 
-// Loader dengan Progress Bar
-function Loader3D() {
-  const { progress } = useProgress();
-
-  return (
-    <Html center style={{ zIndex: 100 }}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "20px",
-          minWidth: "200px",
-        }}
-      >
-        <div
-          style={{
-            width: "60px",
-            height: "60px",
-            border: "4px solid #005792",
-            borderTop: "4px solid #FD5F00",
-            borderRadius: "50%",
-            animation: "spin 0.8s linear infinite",
-          }}
-        />
-
-        <div
-          style={{
-            fontSize: "18px",
-            color: "#005792",
-            fontWeight: "600",
-            fontFamily: "var(--font-poppins), system-ui, sans-serif",
-            whiteSpace: "nowrap",
-          }}
-        >
-          Loading 3D Model...
-        </div>
-
-        <div
-          style={{
-            width: "200px",
-            height: "4px",
-            background: "#E0E0E0",
-            borderRadius: "2px",
-            overflow: "hidden",
-          }}
-        >
-          <div
-            style={{
-              width: `${progress}%`,
-              height: "100%",
-              background: "linear-gradient(90deg, #005792 0%, #FD5F00 100%)",
-              transition: "width 0.3s ease",
-            }}
-          />
-        </div>
-
-        <div
-          style={{
-            fontSize: "14px",
-            color: "#13334C",
-            fontFamily: "var(--font-poppins), system-ui, sans-serif",
-          }}
-        >
-          {progress.toFixed(0)}%
-        </div>
-
-        <style>{`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}</style>
-      </div>
-    </Html>
-  );
-}
-
 // Modal Tutorial Component
 function TutorialModal({ onClose }: { onClose: () => void }) {
   const [deviceType, setDeviceType] = useState<"mobile" | "desktop">("mobile");
@@ -658,31 +580,120 @@ function ControlCard({
 }
 
 useGLTF.preload("/models/BARAMTHR-COMP.glb");
+function PageLoader({ onLoaded }: { onLoaded: () => void }) {
+  const { progress, active } = useProgress();
+
+  useEffect(() => {
+    if (!active && progress === 100) {
+      onLoaded();
+    }
+  }, [active, progress, onLoaded]);
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "#FFFFFF",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 9998,
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "20px",
+          minWidth: "200px",
+        }}
+      >
+        <div
+          style={{
+            width: "60px",
+            height: "60px",
+            border: "4px solid #005792",
+            borderTop: "4px solid #FD5F00",
+            borderRadius: "50%",
+            animation: "spin 0.8s linear infinite",
+          }}
+        />
+        <div
+          style={{
+            fontSize: "18px",
+            color: "#005792",
+            fontWeight: 600,
+            fontFamily: "var(--font-poppins), system-ui, sans-serif",
+            whiteSpace: "nowrap",
+          }}
+        >
+          Loading 3D Model...
+        </div>
+        <div
+          style={{
+            width: "200px",
+            height: "4px",
+            background: "#E0E0E0",
+            borderRadius: "2px",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              width: `${progress}%`,
+              height: "100%",
+              background: "linear-gradient(90deg, #005792 0%, #FD5F00 100%)",
+              transition: "width 0.3s ease",
+            }}
+          />
+        </div>
+        <div
+          style={{
+            fontSize: "14px",
+            color: "#13334C",
+            fontFamily: "var(--font-poppins), system-ui, sans-serif",
+          }}
+        >
+          {progress.toFixed(0)}%
+        </div>
+
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    </div>
+  );
+}
 
 export default function ThreeDPage() {
   const [showTutorial, setShowTutorial] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
   const [cinematicComplete, setCinematicComplete] = useState(false);
   const [showSkipButton, setShowSkipButton] = useState(false);
+  const [assetsLoaded, setAssetsLoaded] = useState(false);
+  const [started, setStarted] = useState(false);
   const orbitControlsRef = useRef<any>(null);
 
+  // Ketika assetsLoaded true, baru tampilkan tutorial
   useEffect(() => {
-    if (isLoaded) {
-      const timer = setTimeout(() => {
-        setShowTutorial(true);
-      }, 100);
-      return () => clearTimeout(timer);
+    if (assetsLoaded) {
+      setShowTutorial(true);
     }
-  }, [isLoaded]);
+  }, [assetsLoaded]);
 
+  // Skip button hanya muncul saat cinematic jalan
   useEffect(() => {
-    if (isLoaded && !cinematicComplete) {
+    if (started && !cinematicComplete) {
       const timer = setTimeout(() => {
         setShowSkipButton(true);
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [isLoaded, cinematicComplete]);
+  }, [started, cinematicComplete]);
 
   const handleSkipCinematic = () => {
     setCinematicComplete(true);
@@ -694,11 +705,20 @@ export default function ThreeDPage() {
     setShowSkipButton(false);
   };
 
+  const handleStart = () => {
+    setShowTutorial(false);
+    setStarted(true); // ✅ mulai cinematic + tampilkan Canvas
+    setCinematicComplete(false);
+    setShowSkipButton(false);
+  };
+
   return (
     <ErrorBoundary3D>
-      {showTutorial && isLoaded && (
-        <TutorialModal onClose={() => setShowTutorial(false)} />
-      )}
+      {/* Loader fullscreen, hanya tampil sebelum assetsLoaded */}
+      {!assetsLoaded && <PageLoader onLoaded={() => setAssetsLoaded(true)} />}
+
+      {/* Tutorial muncul setelah load selesai, sebelum user klik Mulai */}
+      {assetsLoaded && showTutorial && <TutorialModal onClose={handleStart} />}
 
       <div
         style={{
@@ -759,7 +779,7 @@ export default function ThreeDPage() {
         </Link>
 
         {/* Skip Button */}
-        {showSkipButton && !cinematicComplete && (
+        {started && showSkipButton && !cinematicComplete && (
           <button
             onClick={handleSkipCinematic}
             style={{
@@ -800,7 +820,7 @@ export default function ThreeDPage() {
         )}
 
         {/* Help Button */}
-        {!showTutorial && isLoaded && cinematicComplete && (
+        {!showTutorial && assetsLoaded && cinematicComplete && started && (
           <button
             onClick={() => setShowTutorial(true)}
             style={{
@@ -836,40 +856,39 @@ export default function ThreeDPage() {
           </button>
         )}
 
-        <Canvas
-          camera={{ position: [8, 4, 8], fov: 27 }}
-          gl={{ antialias: true, alpha: true }}
-          onCreated={() => {
-            setTimeout(() => setIsLoaded(true), 200);
-          }}
-        >
-          <color attach="background" args={["#FFFFFF"]} />
-          <ambientLight intensity={0.8} />
-          <directionalLight position={[10, 10, 5]} intensity={1.2} />
+        {/* Canvas hanya dirender setelah user klik Mulai */}
+        {started && (
+          <Canvas
+            camera={{ position: [8, 4, 8], fov: 27 }}
+            gl={{ antialias: true, alpha: true }}
+          >
+            <color attach="background" args={["#FFFFFF"]} />
+            <ambientLight intensity={0.8} />
+            <directionalLight position={[10, 10, 5]} intensity={1.2} />
 
-          <Suspense fallback={<Loader3D />}>
-            <CompleteScene />
-          </Suspense>
+            {/* Model langsung tanpa Suspense loader, karena sudah dimuat sebelumnya */}
+            <Suspense fallback={null}>
+              <CompleteScene />
+              <Environment preset="city" />
+            </Suspense>
 
-          <Suspense fallback={null}>
-            <Environment preset="city" />
-          </Suspense>
+            {/* Cinematic hanya saat belum complete */}
+            {!cinematicComplete && (
+              <CinematicCamera onComplete={handleCinematicComplete} />
+            )}
 
-          {isLoaded && !cinematicComplete && (
-            <CinematicCamera onComplete={handleCinematicComplete} />
-          )}
-
-          <OrbitControls
-            ref={orbitControlsRef}
-            enabled={cinematicComplete}
-            enableZoom
-            enablePan
-            enableRotate
-            maxPolarAngle={Math.PI / 2}
-            minDistance={3}
-            maxDistance={15}
-          />
-        </Canvas>
+            <OrbitControls
+              ref={orbitControlsRef}
+              enabled={cinematicComplete}
+              enableZoom
+              enablePan
+              enableRotate
+              maxPolarAngle={Math.PI / 2}
+              minDistance={3}
+              maxDistance={15}
+            />
+          </Canvas>
+        )}
       </div>
     </ErrorBoundary3D>
   );
