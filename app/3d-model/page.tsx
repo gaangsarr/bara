@@ -56,7 +56,7 @@ const areaInfo: Record<AreaKey, AreaInfo> = {
 function CinematicCamera({ onComplete }: { onComplete: () => void }) {
   const { camera } = useThree();
   const [cinematicTime, setCinematicTime] = useState(0);
-  const cinematicDuration = 18;
+  const cinematicDuration = 25;
   const hasCompleted = useRef(false);
 
   useFrame((state, delta) => {
@@ -67,13 +67,23 @@ function CinematicCamera({ onComplete }: { onComplete: () => void }) {
         t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
       const keyframes = [
+        // 1. Opening: Wide shot (0-5 detik)
         { pos: [8.8, 6.7, 7.9], lookAt: [0, 0, 0], time: 0 },
-        { pos: [-0.2, 0.9, 4.6], lookAt: [-2, 0, 0], time: 0.2 },
-        { pos: [5, 1, 3], lookAt: [0, 0, 0], time: 0.4 },
-        { pos: [6, 1, -1], lookAt: [2, 0, -1], time: 0.55 },
-        { pos: [-9.5, 3.2, -10.5], lookAt: [0, 0, 0], time: 0.75 },
-        { pos: [-9.5, 3.2, -10.5], lookAt: [0, 0, 0], time: 0.85 },
-        { pos: [5, 2, 5], lookAt: [0, 0, 0], time: 1.0 },
+
+        // 2. LEFT Area (5-10 detik)
+        { pos: [3.2, 1.1, 6.7], lookAt: [0.3, 0.4, 2.7], time: 0.2 },
+
+        // 3. CENTER Area (10-15 detik)
+        { pos: [5.2, 0.8, 4.3], lookAt: [1.3, -0.4, 0.7], time: 0.4 },
+
+        // 4. RIGHT Area (15-20 detik)
+        { pos: [4.9, 0.4, 2.6], lookAt: [0.8, -0.5, -2], time: 0.6 },
+
+        // 5. Back View (20-22.5 detik)
+        { pos: [-7.2, 2.5, -7.9], lookAt: [0.6, -0.2, 0.7], time: 0.8 },
+
+        // 6. Final Overview (22.5-25 detik)
+        { pos: [8.2, 2.5, 7.0], lookAt: [4.5, 1.2, 3.8], time: 1.0 },
       ];
 
       let current = keyframes[0];
@@ -134,7 +144,7 @@ function CinematicCamera({ onComplete }: { onComplete: () => void }) {
 }
 
 function CompleteScene() {
-  const { scene } = useGLTF("/models/BARA3-COMP.glb");
+  const { scene } = useGLTF("/models/BARA333.glb");
   const { camera } = useThree();
   const [selectedArea, setSelectedArea] = useState<AreaKey | null>(null);
   const [clickPosition, setClickPosition] = useState<[number, number, number]>([
@@ -647,16 +657,14 @@ function ControlCard({
   );
 }
 
-useGLTF.preload("/models/BARA3-COMP.glb");
+useGLTF.preload("/models/BARA333.glb");
 
 export default function ThreeDPage() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [cinematicComplete, setCinematicComplete] = useState(false);
   const [showSkipButton, setShowSkipButton] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
   const orbitControlsRef = useRef<any>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (isLoaded) {
@@ -676,55 +684,6 @@ export default function ThreeDPage() {
     }
   }, [isLoaded, cinematicComplete]);
 
-  // Initialize audio - FIX VERSION
-  useEffect(() => {
-    // Create audio element
-    const audio = new Audio("/assets/bg-music2.mp3");
-    audio.loop = true;
-    audio.volume = 0.5;
-    audioRef.current = audio;
-
-    // Try autoplay dengan error handling
-    const attemptAutoplay = async () => {
-      try {
-        await audio.play();
-        setIsPlaying(true);
-        console.log("✅ Audio autoplay SUCCESS!");
-      } catch (error) {
-        console.log("❌ Autoplay blocked, waiting for user interaction...");
-        setIsPlaying(false);
-
-        // Backup: Play on first user click/touch
-        const playOnInteraction = async () => {
-          try {
-            await audio.play();
-            setIsPlaying(true);
-            console.log("✅ Audio started after user interaction");
-            // Remove listener after successful play
-            document.removeEventListener("click", playOnInteraction);
-            document.removeEventListener("touchstart", playOnInteraction);
-          } catch (err) {
-            console.log("Still blocked:", err);
-          }
-        };
-
-        document.addEventListener("click", playOnInteraction, { once: true });
-        document.addEventListener("touchstart", playOnInteraction, {
-          once: true,
-        });
-      }
-    };
-
-    attemptAutoplay();
-
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
-  }, []);
-
   const handleSkipCinematic = () => {
     setCinematicComplete(true);
     setShowSkipButton(false);
@@ -733,24 +692,6 @@ export default function ThreeDPage() {
   const handleCinematicComplete = () => {
     setCinematicComplete(true);
     setShowSkipButton(false);
-  };
-
-  const toggleAudio = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-        setIsPlaying(false);
-      } else {
-        audioRef.current
-          .play()
-          .then(() => {
-            setIsPlaying(true);
-          })
-          .catch((err) => {
-            console.log("Play failed:", err);
-          });
-      }
-    }
   };
 
   return (
@@ -859,7 +800,7 @@ export default function ThreeDPage() {
         )}
 
         {/* Help Button */}
-        {!showTutorial && (
+        {!showTutorial && isLoaded && cinematicComplete && (
           <button
             onClick={() => setShowTutorial(true)}
             style={{
@@ -894,50 +835,6 @@ export default function ThreeDPage() {
             ?
           </button>
         )}
-
-        {/* Audio Button */}
-        <button
-          onClick={toggleAudio}
-          style={{
-            position: "absolute",
-            top: "80px",
-            right: "20px",
-            zIndex: 1000,
-            padding: "12px",
-            background: isPlaying ? "#00A3E0" : "#666",
-            color: "white",
-            border: "none",
-            borderRadius: "50%",
-            cursor: "pointer",
-            width: "48px",
-            height: "48px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
-            transition: "all 0.3s ease",
-            fontFamily: "var(--font-poppins), system-ui, sans-serif",
-            fontSize: "20px",
-          }}
-          title={isPlaying ? "Pause Music" : "Play Music"}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = "scale(1.1)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = "scale(1)";
-          }}
-        >
-          {isPlaying ? (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <rect x="6" y="4" width="4" height="16" />
-              <rect x="14" y="4" width="4" height="16" />
-            </svg>
-          ) : (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          )}
-        </button>
 
         <Canvas
           camera={{ position: [8, 4, 8], fov: 27 }}
