@@ -21,6 +21,10 @@
   --font-mono: var(--font-geist-mono);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background: var(--background);
   font-family: var(--font-poppins), Arial, Helvetica, sans-serif;

@@ -10,7 +10,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "BARA PROJECT",
+  title: "BARA | Coastal Resilience Engine",
   description: "Sand Battery Energy Storage System - Renewable Energy Solution",
   keywords: ["sand battery", "renewable energy", "energy storage"],
   authors: [

@@ -30,7 +30,8 @@ export default function HeroSection() {
 
   return (
     <section
-      className="relative w-full min-h-[calc(100vh-72px)] overflow-hidden"
+      id="home"
+      className="relative w-full overflow-hidden"
       style={{
         background: "linear-gradient(180deg, #CEDEFF 0%, #FFFFFF 100%)",
       }}

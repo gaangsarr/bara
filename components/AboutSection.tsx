@@ -87,7 +87,7 @@ export default function AboutSection() {
   ];
 
   return (
-    <section className="w-full py-16 md:py-20 bg-white">
+    <section className="w-full pt-24 md:pt-28 bg-white" id="about">
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         {/* What is BARA Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center mb-20">

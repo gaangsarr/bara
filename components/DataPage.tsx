@@ -33,37 +33,53 @@ const BarraInnovationData = () => {
   // Real data dari Polar Night Energy
   const data = {
     overview: {
-      title: "Sand Battery Projects",
+      title: "Integrated Coastal Sand Battery System",
       stats: [
-        { label: "Pornainen (Operational)", value: "100 MWh", power: "1 MW" },
-        { label: "Lahti Energia (2027)", value: "250 MWh", power: "2 MW" },
-        { label: "Efficiency", value: "85-90%", power: "" },
-        { label: "CO2 Reduction", value: "70%", power: "vs Woodchip" },
+        {
+          label: "Kapasitas PLTS + PLTB",
+          value: "5 MW",
+          power: "3 MW angin + 2 MW surya",
+        },
+        {
+          label: "Kapasitas Sand Battery",
+          value: "8 MWh",
+          power: "Berbasis panas 500–600°C",
+        },
+        {
+          label: "Daya ke Desalinasi",
+          value: "4 MW",
+          power: "Dari sand battery + langsung dari PLTS/PLTB",
+        },
+        {
+          label: "Target Layanan",
+          value: "150+ bangunan",
+          power: "Pemukiman & fasilitas pesisir",
+        },
       ],
     },
     capacity: {
-      title: "Storage Capacity by Project",
+      title: "Kapasitas Energi di Sistem Pesisir",
       datasets: {
-        "Kankaanpää 2022": [8],
-        "Pornainen 2025": [100],
-        "Lahti Energia 2027": [250],
-        "10 MW Scale": [1000],
+        "Kapasitas sand battery (MWh)": [4, 8, 20, 50],
       },
     },
+
     performance: {
-      title: "Operational Performance",
+      title: "Performa Sand Battery",
+      // Pola mengikuti karakteristik sand battery: suhu tinggi, efisiensi stabil [web:66][web:84]
       datasets: {
-        "Efficiency (%)": [85, 87, 88, 90, 89, 88, 87],
-        "Charge Temp (°C)": [500, 550, 580, 600, 590, 570, 550],
-        "Discharge Temp (°C)": [400, 380, 370, 360, 375, 385, 395],
+        "Efisiensi siklus (%)": [85, 88, 90, 89, 90, 91, 90],
+        "Suhu penyimpanan (°C)": [520, 540, 560, 580, 590, 600, 580],
+        "Durasi simpan (hari)": [1, 3, 7, 14, 21, 30, 45], // lama panas masih berguna
       },
     },
     savings: {
-      title: "Environmental Impact",
+      title: "Dampak untuk Daerah Pesisir",
+      // Terinspirasi studi desalinasi bertenaga terbarukan: penurunan emisi & biaya [web:87][web:90][web:95]
       datasets: {
-        "CO2 Reduction (%)": [60, 65, 68, 70, 72, 70, 68],
-        "Fuel Cost Savings (%)": [50, 55, 60, 65, 68, 66, 62],
-        "Biomass Reduction (%)": [50, 55, 58, 60, 62, 60, 58],
+        "Pengurangan emisi CO₂ (%)": [40, 50, 60, 70, 75, 78, 80],
+        "Pengurangan diesel untuk genset (%)": [50, 60, 70, 80, 85, 88, 90],
+        "Peningkatan ketersediaan air (%)": [30, 45, 60, 75, 85, 90, 95],
       },
     },
   };
@@ -74,7 +90,7 @@ const BarraInnovationData = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold text-biru-tua mb-4">
-            Sand Battery Data
+            Sand Battery Simulation
           </h1>
         </div>
 
@@ -137,33 +153,7 @@ const BarraInnovationData = () => {
 
         {/* Sources */}
         <div className="mt-16 text-center">
-          <p className="text-sm text-gray-500 mb-4">Data sources:</p>
-          <div className="flex flex-wrap justify-center gap-4 text-xs text-gray-500">
-            <a
-              href="https://polarnightenergy.com/sand-battery/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-blue-600 hover:underline"
-            >
-              Polar Night Energy
-            </a>
-            <a
-              href="https://www.ess-news.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-blue-600 hover:underline"
-            >
-              ESS News
-            </a>
-            <a
-              href="https://www.pv-magazine.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-blue-600 hover:underline"
-            >
-              PV Magazine
-            </a>
-          </div>
+          <p className="text-sm text-gray-500 mb-4">Data Simulasi...</p>
         </div>
       </div>
     </div>
@@ -197,8 +187,7 @@ const OverviewTab = ({ data }: { data: any }) => (
   </div>
 );
 
-// Chart Component
-// Chart Component - WARNA BERBEDA per dataset
+// Chart Component - WARNA BERBEDA per dataset & LABEL SESUAI DATA
 const ChartTab = ({
   title,
   datasets,
@@ -238,64 +227,90 @@ const ChartTab = ({
     },
   };
 
-  // ✅ WARNA PALETTE BERBEDA per dataset
   const colorPalette = [
-    "#3b82f6", // Blue - Kankaanpää
-    "#10b981", // Green - Pornainen
-    "#f59e0b", // Amber - Lahti
-    "#ef4444", // Red - 10MW
-    "#8b5cf6", // Purple - Efficiency
-    "#06b6d4", // Cyan - Temp
-    "#84cc16", // Lime - CO2
-    "#f97316", // Orange - Fuel
+    "#3b82f6",
+    "#10b981",
+    "#f59e0b",
+    "#ef4444",
+    "#8b5cf6",
+    "#06b6d4",
+    "#84cc16",
+    "#f97316",
   ];
 
-  const chartData = {
-    labels:
-      type === "bar"
-        ? ["Kankaanpää", "Pornainen", "Lahti", "10MW"]
-        : [
-            "Week 1",
-            "Week 2",
-            "Week 3",
-            "Week 4",
-            "Week 5",
-            "Week 6",
-            "Week 7",
-          ],
-    datasets: Object.entries(datasets).map(
-      ([key, values]: [string, any], index: number) => {
-        const colorIndex = index % colorPalette.length;
+  // ✅ labels bar & line dipisah logika
+  const labels =
+    type === "bar"
+      ? [
+          "Skenario awal",
+          "Desa pesisir menengah",
+          "Kota pesisir kecil",
+          "Kluster pesisir besar",
+        ]
+      : [
+          "Titik 1",
+          "Titik 2",
+          "Titik 3",
+          "Titik 4",
+          "Titik 5",
+          "Titik 6",
+          "Titik 7",
+        ];
 
-        return {
-          label: key.replace(/^\w/, (c) => c.toUpperCase()),
+  let chartData: any;
+
+  if (type === "bar") {
+    // ✅ capacity: 1 dataset dengan 4 nilai
+    const [key, values] = Object.entries(datasets)[0] as [string, any];
+
+    chartData = {
+      labels,
+      datasets: [
+        {
+          label: key,
           data: values,
-          borderColor: colorPalette[colorIndex],
-          backgroundColor:
-            type === "bar"
-              ? colorPalette[colorIndex] + "20" // Bar: solid + 20% opacity
-              : `rgba(${parseInt(
-                  colorPalette[colorIndex].slice(1, 3),
-                  16
-                )},${parseInt(
-                  colorPalette[colorIndex].slice(3, 5),
-                  16
-                )},${parseInt(colorPalette[colorIndex].slice(5, 7), 16)},0.1)`, // Line: 10% opacity
-          tension: type === "line" ? 0.4 : 0,
-          fill: type === "line",
+          borderColor: colorPalette[0],
+          backgroundColor: colorPalette[0] + "33", // ~20% opacity
           barPercentage: 0.8,
           categoryPercentage: 0.9,
-        };
-      }
-    ),
-  };
+        },
+      ],
+    };
+  } else {
+    // ✅ line charts (performance & savings) tetap multi-dataset
+    chartData = {
+      labels,
+      datasets: Object.entries(datasets).map(
+        ([key, values]: [string, any], index: number) => {
+          const color = colorPalette[index % colorPalette.length];
+
+          const hexToRgba = (hex: string, alpha: number) => {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+          };
+
+          return {
+            label: key,
+            data: values,
+            borderColor: color,
+            backgroundColor: hexToRgba(color, 0.1),
+            tension: 0.4,
+            fill: true,
+          };
+        }
+      ),
+    };
+  }
 
   return (
     <div className="p-8">
       <div className="mb-8">
         <h2 className="text-2xl font-semibold text-gray-900 mb-2">{title}</h2>
         <p className="text-sm text-gray-600">
-          Real data from operational projects
+          Simulasi kinerja sistem energi terbarukan–sand battery–desalinasi di
+          wilayah pesisir.
         </p>
       </div>
 

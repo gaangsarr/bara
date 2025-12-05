@@ -31,23 +31,36 @@ const areaInfo: Record<AreaKey, AreaInfo> = {
     name: "Renewable Energy Source",
     title: "Solar & Wind Power",
     description:
-      "Pembangkit listrik tenaga surya dan angin yang menghasilkan energi bersih",
-    specs: ["Solar: 2 MW", "Wind: 3 MW", "Total: 5 MW"],
+      "Area pembangkit yang menggabungkan tenaga surya dan angin untuk menghasilkan listrik rendah emisi yang memasok sistem Sand Battery.",
+    specs: [
+      "Kapasitas PLTS: ±2 MW",
+      "Kapasitas PLTB: ±3 MW",
+      "Total daya terpasang: ±5 MW",
+    ],
     color: "#00A3E0",
   },
   CenterArea: {
     name: "Sand Battery",
     title: "Sand Battery Storage",
-    description: "Sistem penyimpanan energi thermal berbasis sand battery",
-    specs: ["Kapasitas: 8 MWh", "Suhu: 500-600°C", "Efisiensi: 95%"],
+    description:
+      "Sand Battery menyimpan energi listrik dari sumber terbarukan dalam bentuk panas pada media pasir bersuhu tinggi sehingga dapat dimanfaatkan secara fleksibel saat dibutuhkan.",
+    specs: [
+      "Kapasitas penyimpanan: ~8 MWh",
+      "Rentang operasi suhu: 500–600°C",
+      "Perkiraan efisiensi siklus: hingga ±90–95%",
+    ],
     color: "#005792",
   },
   RightArea: {
-    name: "Industrial Complex",
-    title: "Energy Distribution",
+    name: "Sea Water Desalination",
+    title: "Desalination Plant",
     description:
-      "Kompleks industri yang menggunakan energi dari sistem penyimpanan",
-    specs: ["Konsumsi: 4 MW", "24/7 supply", "150+ buildings"],
+      "Fasilitas desalinasi yang memanfaatkan energi dari Sand Battery dan pembangkit terbarukan untuk mengubah air laut menjadi air tawar bagi kebutuhan industri dan pemukiman.",
+    specs: [
+      "Kebutuhan daya operasi: ~4 MW",
+      "Operasi berkelanjutan: 24/7",
+      "Cakupan layanan: >150 bangunan/konsumen",
+    ],
     color: "#FD5F00",
   },
 };
@@ -168,9 +181,11 @@ function CompleteScene() {
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
 
+    const point = event.point; // world coords (x, y, z)
     let clickedObject: Object3D | null = event.object;
     let areaName: AreaKey | null = null;
 
+    // 1) Coba deteksi lewat nama parent di GLB
     while (clickedObject && !areaName) {
       if (clickedObject.name && clickedObject.name in areaInfo) {
         areaName = clickedObject.name as AreaKey;
@@ -179,15 +194,49 @@ function CompleteScene() {
       clickedObject = clickedObject.parent;
     }
 
+    // 2) Kalau belum ketemu → pakai bounding box per area (X–Z only)
     if (!areaName) {
-      const x = event.point.x;
-      if (x < -2) areaName = "LeftArea";
-      else if (x > 2) areaName = "RightArea";
-      else areaName = "CenterArea";
+      const x = point.x;
+      const z = point.z;
+
+      // === LEFT AREA BOUNDING BOX ===
+      // Data ujung yang kamu kirim:
+      // (-1.42, -0.39), (-1.12, 1.72), (-0.27, 0.88), (-2.06, 0.61)
+      // Ambil min/max dan sedikit dilebarkan
+      const leftXMin = -2.2;
+      const leftXMax = -0.1;
+      const leftZMin = -0.6; // agak dikurangi biar ngga kepotong depan
+      const leftZMax = 1.9; // agak dilebarkan ke belakang
+
+      // === RIGHT AREA BOUNDING BOX ===
+      // Data ujung yang kamu kirim sebelumnya:
+      // (0.25, -0.84), (1.50, -0.81), (1.42, -2.23), (0.27, -2.18)
+      const rightXMin = 0.1;
+      const rightXMax = 1.7;
+      const rightZMin = -2.4;
+      const rightZMax = -0.6;
+
+      const inLeftArea =
+        x >= leftXMin && x <= leftXMax && z >= leftZMin && z <= leftZMax;
+
+      const inRightArea =
+        x >= rightXMin && x <= rightXMax && z >= rightZMin && z <= rightZMax;
+
+      if (inLeftArea) {
+        // ✅ Semua objek di atas platform kiri (termasuk awan) → LeftArea
+        areaName = "LeftArea";
+      } else if (inRightArea) {
+        areaName = "RightArea";
+      } else {
+        // 3) Fallback terakhir: partisi kasar berdasarkan X
+        if (x < -2) areaName = "LeftArea";
+        else if (x > 2) areaName = "RightArea";
+        else areaName = "CenterArea";
+      }
     }
 
     setSelectedArea(areaName);
-    setClickPosition([event.point.x, event.point.y, event.point.z]);
+    setClickPosition([point.x, point.y, point.z]);
   };
 
   const info = selectedArea ? areaInfo[selectedArea] : null;
@@ -305,7 +354,6 @@ function CompleteScene() {
   );
 }
 
-// Modal Tutorial Component
 function TutorialModal({ onClose }: { onClose: () => void }) {
   const [deviceType, setDeviceType] = useState<"mobile" | "desktop">("mobile");
 
@@ -319,8 +367,9 @@ function TutorialModal({ onClose }: { onClose: () => void }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: "20px",
-        backdropFilter: "blur(5px)",
+        padding: "16px",
+        overflowY: "auto",
+        WebkitOverflowScrolling: "touch",
       }}
       onClick={onClose}
     >
@@ -329,11 +378,12 @@ function TutorialModal({ onClose }: { onClose: () => void }) {
           background: "white",
           borderRadius: "20px",
           width: "100%",
-          maxWidth: "400px", // ← Smaller maxWidth
-          maxHeight: "85vh", // ← Slightly smaller
-          overflow: "hidden", // ← No scroll
+          maxWidth: "420px",
+          maxHeight: "90vh",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
           fontFamily: "var(--font-poppins), system-ui, sans-serif",
-          position: "relative",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -341,127 +391,151 @@ function TutorialModal({ onClose }: { onClose: () => void }) {
         <div
           style={{
             background: "linear-gradient(135deg, #005792 0%, #13334C 100%)",
-            padding: "24px 20px",
+            padding: "20px 18px",
             color: "white",
           }}
         >
-          <h2 style={{ margin: 0, fontSize: "24px", fontWeight: "bold" }}>
+          <h2
+            style={{
+              margin: 0,
+              fontSize: "22px",
+              fontWeight: 700,
+            }}
+          >
             Petunjuk Navigasi
           </h2>
-          <p style={{ margin: "4px 0 0 0", opacity: 0.9, fontSize: "13px" }}>
+          <p
+            style={{
+              margin: "6px 0 0 0",
+              opacity: 0.9,
+              fontSize: "13px",
+            }}
+          >
             Pelajari cara menggunakan model 3D interaktif
           </p>
         </div>
 
-        {/* Rekomendasi Perangkat */}
+        {/* Konten scrollable */}
         <div
           style={{
-            background: "#FFF3CD",
-            border: "1px solid #FFC107",
-            borderRadius: "8px",
-            padding: "12px 16px",
-            margin: "16px",
-            display: "flex",
-            alignItems: "start",
-            gap: "8px",
+            padding: "16px 18px 8px 18px",
+            overflowY: "auto",
+            WebkitOverflowScrolling: "touch",
           }}
         >
-          <div style={{ fontSize: "12px", lineHeight: "1.4" }}>
-            <div style={{ fontWeight: "600", color: "#856404" }}>
+          {/* Rekomendasi perangkat */}
+          <div
+            style={{
+              background: "#FFF7E0",
+              border: "1px solid #FACC15",
+              borderRadius: "10px",
+              padding: "10px 12px",
+              marginBottom: "16px",
+            }}
+          >
+            <div
+              style={{
+                fontWeight: 600,
+                fontSize: "12px",
+                color: "#92400E",
+                marginBottom: "4px",
+              }}
+            >
               Rekomendasi
             </div>
-            <div style={{ color: "#856404" }}>
-              Gunakan <strong>Laptop/Desktop</strong> untuk pengalaman terbaik
+            <div
+              style={{
+                fontSize: "12px",
+                color: "#92400E",
+                lineHeight: 1.5,
+              }}
+            >
+              Gunakan <strong>Laptop/Desktop</strong> untuk pengalaman terbaik.
             </div>
           </div>
-        </div>
 
-        {/* Device Switcher */}
-        <div
-          style={{
-            display: "flex",
-            gap: "8px",
-            padding: "0 16px",
-            justifyContent: "center",
-            marginBottom: "12px",
-          }}
-        >
-          <button
-            onClick={() => setDeviceType("mobile")}
+          {/* Switch Mobile / Desktop */}
+          <div
             style={{
-              flex: 1,
-              padding: "10px 8px",
-              borderRadius: "10px",
-              border: "2px solid #005792",
-              background: deviceType === "mobile" ? "#005792" : "white",
-              color: deviceType === "mobile" ? "white" : "#005792",
-              fontWeight: "600",
-              cursor: "pointer",
-              fontSize: "13px",
-              transition: "all 0.2s",
+              display: "flex",
+              gap: "8px",
+              marginBottom: "16px",
             }}
           >
-            Mobile
-          </button>
-          <button
-            onClick={() => setDeviceType("desktop")}
-            style={{
-              flex: 1,
-              padding: "10px 8px",
-              borderRadius: "10px",
-              border: "2px solid #005792",
-              background: deviceType === "desktop" ? "#005792" : "white",
-              color: deviceType === "desktop" ? "white" : "#005792",
-              fontWeight: "600",
-              cursor: "pointer",
-              fontSize: "13px",
-              transition: "all 0.2s",
-            }}
-          >
-            Desktop
-          </button>
-        </div>
+            <button
+              onClick={() => setDeviceType("mobile")}
+              style={{
+                flex: 1,
+                padding: "10px 8px",
+                borderRadius: "999px",
+                border: "1px solid #005792",
+                background: deviceType === "mobile" ? "#005792" : "white",
+                color: deviceType === "mobile" ? "white" : "#005792",
+                fontWeight: 600,
+                fontSize: "13px",
+                cursor: "pointer",
+              }}
+            >
+              Mobile
+            </button>
+            <button
+              onClick={() => setDeviceType("desktop")}
+              style={{
+                flex: 1,
+                padding: "10px 8px",
+                borderRadius: "999px",
+                border: "1px solid #005792",
+                background: deviceType === "desktop" ? "#005792" : "white",
+                color: deviceType === "desktop" ? "white" : "#005792",
+                fontWeight: 600,
+                fontSize: "13px",
+                cursor: "pointer",
+              }}
+            >
+              Desktop
+            </button>
+          </div>
 
-        {/* Controls - Compact Grid */}
-        <div style={{ padding: "0 16px 24px 16px" }}>
+          {/* Cards kontrol */}
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 1fr", // ← 2 kolom mobile
-              gap: "12px",
+              gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+              gap: "10px",
+              marginBottom: "8px",
             }}
           >
             {deviceType === "mobile" ? (
               <>
-                <ControlCardCompact
+                <ControlCard
                   iconSrc="/assets/spin-min.png"
                   title="Putar"
                   description="1 jari geser"
                 />
-                <ControlCardCompact
+                <ControlCard
                   iconSrc="/assets/move-min.png"
                   title="Pindah"
                   description="2 jari geser"
                 />
-                <ControlCardCompact
+                <ControlCard
                   iconSrc="/assets/zoom-min.png"
                   title="Zoom"
-                  description="Pinch cubit"
+                  description="Pinch (cubit)"
                 />
               </>
             ) : (
               <>
-                <ControlCardCompact
+                <ControlCard
                   iconSrc="/assets/mouse-min.png"
                   title="Putar"
-                  description="Kiri + drag"
+                  description="Klik kiri + drag"
                 />
-                <ControlCardCompact
+                <ControlCard
                   iconSrc="/assets/mouse-min.png"
                   title="Pindah"
-                  description="Kanan + drag"
+                  description="Klik kanan + drag"
                 />
-                <ControlCardCompact
+                <ControlCard
                   iconSrc="/assets/zoom-min.png"
                   title="Zoom"
                   description="Scroll wheel"
@@ -471,41 +545,30 @@ function TutorialModal({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        {/* Mulai Button - Fixed Position */}
+        {/* Footer, selalu terlihat */}
         <div
           style={{
-            padding: "16px 20px",
+            padding: "12px 18px 16px 18px",
+            borderTop: "1px solid #E5E7EB",
             background: "white",
-            borderTop: "1px solid #E0E0E0",
+            flexShrink: 0,
           }}
         >
           <button
             onClick={onClose}
             style={{
               width: "100%",
-              padding: "14px 20px",
-              borderRadius: "12px",
+              padding: "12px 18px",
+              borderRadius: "10px",
               border: "none",
-              background: "linear-gradient(135deg, #FD5F00 0%, #FF8A3D 100%)",
+              background: "#FD5F00",
               color: "white",
-              fontWeight: "600",
+              fontWeight: 600,
+              fontSize: "15px",
               cursor: "pointer",
-              fontSize: "16px",
-              boxShadow: "0 4px 12px rgba(253, 95, 0, 0.3)",
-              transition: "all 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow =
-                "0 6px 16px rgba(253, 95, 0, 0.4)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow =
-                "0 4px 12px rgba(253, 95, 0, 0.3)";
             }}
           >
-            Mulai Pengalaman 3D
+            Mulai
           </button>
         </div>
       </div>
@@ -513,8 +576,7 @@ function TutorialModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-// Compact Control Card untuk mobile
-function ControlCardCompact({
+function ControlCard({
   iconSrc,
   title,
   description,
@@ -526,37 +588,48 @@ function ControlCardCompact({
   return (
     <div
       style={{
-        background: "#F8F9FA",
-        borderRadius: "12px",
-        padding: "12px",
+        background: "#F9FAFB",
+        borderRadius: "10px",
+        padding: "10px 8px",
         textAlign: "center",
-        border: "1px solid #E0E0E0",
-        transition: "all 0.2s",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: "6px",
+        border: "1px solid #E5E7EB",
       }}
     >
-      <img
-        src={iconSrc}
-        alt={title}
-        style={{
-          width: "40px",
-          height: "40px",
-          objectFit: "contain",
-        }}
-      />
       <div
         style={{
-          fontWeight: "600",
-          color: "#005792",
-          fontSize: "14px",
+          marginBottom: "6px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "40px",
+        }}
+      >
+        <img
+          src={iconSrc}
+          alt={title}
+          style={{
+            width: "32px",
+            height: "32px",
+            objectFit: "contain",
+          }}
+        />
+      </div>
+      <div
+        style={{
+          fontWeight: 600,
+          fontSize: "13px",
+          marginBottom: "2px",
+          color: "#111827",
         }}
       >
         {title}
       </div>
-      <div style={{ fontSize: "11px", color: "#666", lineHeight: "1.3" }}>
+      <div
+        style={{
+          fontSize: "11px",
+          color: "#6B7280",
+        }}
+      >
         {description}
       </div>
     </div>
