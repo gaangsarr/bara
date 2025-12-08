@@ -94,7 +94,7 @@ export default function AboutSection() {
           {/* Image */}
           <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px] rounded-lg overflow-hidden shadow-xl">
             <Image
-              src="/about.jpg"
+              src="/baraHome.png"
               alt="BARA Facility"
               fill
               className="object-cover"
@@ -105,7 +105,7 @@ export default function AboutSection() {
           {/* Text Content */}
           <div>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
-              What is <span style={{ color: "#FD5F00" }}>BARA</span>?
+              Apa itu <span style={{ color: "#FD5F00" }}>BARA</span>?
             </h2>
             <p className="text-base md:text-lg leading-relaxed text-gray-700 text-justify">
               BARA adalah sistem desalinasi termal terintegrasi yang
