@@ -7,7 +7,6 @@ export default function Home() {
     <div>
       <HeroSection />
       <AboutSection />
-      <BarraInnovationData />
     </div>
   );
 }

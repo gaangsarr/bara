@@ -94,7 +94,7 @@ export default function AboutSection() {
           {/* Image */}
           <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px] rounded-lg overflow-hidden shadow-xl">
             <Image
-              src="/aboutBara.jpg"
+              src="/about.jpg"
               alt="BARA Facility"
               fill
               className="object-cover"
@@ -107,12 +107,13 @@ export default function AboutSection() {
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6">
               What is <span style={{ color: "#FD5F00" }}>BARA</span>?
             </h2>
-            <p className="text-base md:text-lg leading-relaxed text-gray-700">
-              BARA is a portable thermal energy storage system that utilizes the
-              heat retention properties of sand to provide safe, flameless
-              cooking and electricity. Designed for disaster relief, it
-              eliminates the fire risks and toxic smoke associated with
-              traditional emergency fuels like gas or firewood.
+            <p className="text-base md:text-lg leading-relaxed text-gray-700 text-justify">
+              BARA adalah sistem desalinasi termal terintegrasi yang
+              memanfaatkan panas tersimpan dalam pasir untuk mengubah air laut
+              menjadi air bersih secara berkelanjutan. Dirancang untuk ketahanan
+              wilayah pesisir, inovasi ini menghilangkan ketergantungan pada
+              energi kotor dan biaya operasional tinggi yang melekat pada pabrik
+              penyulingan air konvensional.
             </p>
           </div>
         </div>
