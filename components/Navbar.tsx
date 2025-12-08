@@ -26,7 +26,7 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center z-50">
-            <div className="relative w-[90%] min-w-14 max-w-[60px] aspect-1277/1952 transition-transform duration-300 ease-in-out hover:scale-110">
+            <div className="relative w-[90%] min-w-13 max-w-[60px] aspect-1277/1952 transition-transform duration-300 ease-in-out hover:scale-110">
               <Image
                 src="/LOGO-BARA.png"
                 alt="Logo"
@@ -108,7 +108,7 @@ export default function Navbar() {
       {/* Backdrop Overlay */}
       {isMenuOpen && (
         <div
-          className="fixed inset-0 md:hidden bg-white/50 z-49 h-full"
+          className="fixed inset-0 md:hidden bg-black/50 z-49 h-full"
           onClick={() => setIsMenuOpen(false)}
         ></div>
       )}

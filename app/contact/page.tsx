@@ -10,16 +10,13 @@ export default function ContactPage() {
     <div className="min-h-screen bg-[#CEDEFF] py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         {/* Header Section */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-14">
           <h1
-            className="text-5xl md:text-6xl font-bold mb-6"
+            className="text-4xl md:text-6xl font-bold mb-1"
             style={{ color: "#005792" }}
           >
-            Hubungi Kami
+            Hubungi Kami!
           </h1>
-          <p className="text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto">
-            Ada pertanyaan tentang BARA? Kami siap membantu Anda!
-          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
