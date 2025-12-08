@@ -94,7 +94,7 @@ export default function AboutSection() {
           {/* Image */}
           <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px] rounded-lg overflow-hidden shadow-xl">
             <Image
-              src="/baraHome.png"
+              src="/baraAbout.png"
               alt="BARA Facility"
               fill
               className="object-cover"

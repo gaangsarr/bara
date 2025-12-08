@@ -150,11 +150,6 @@ const BarraInnovationData = () => {
             )}
           </motion.section>
         </AnimatePresence>
-
-        {/* Sources */}
-        <div className="mt-16 text-center">
-          <p className="text-sm text-gray-500 mb-4">Data Simulasi...</p>
-        </div>
       </div>
     </div>
   );
