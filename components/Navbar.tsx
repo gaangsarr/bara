@@ -15,7 +15,7 @@ export default function Navbar() {
     { href: "/", label: "Home" },
     { href: "/3d-model", label: "3D Model" },
     { href: "#about", label: "About" },
-    { href: "/technology", label: "Technology" },
+    { href: "/#fact", label: "Fact" },
     { href: "/our-team", label: "Our Team" },
     { href: "/contact", label: "Contact" },
   ];

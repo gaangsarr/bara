@@ -16,6 +16,8 @@ import {
   Zap,
   ExternalLink,
   BookOpen,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -310,10 +312,14 @@ const FACTS_DATA = {
 // ============================================
 // COMPONENTS
 // ============================================
+// ============================================
+// COMPONENTS
+// ============================================
 export default function FactInnovation() {
   const [activeTab, setActiveTab] = useState<
     "problem" | "solution" | "tech" | "impact"
   >("problem");
+  const [showAllReferences, setShowAllReferences] = useState(false);
 
   const tabs = [
     { id: "problem", label: "Masalah", icon: AlertTriangle },
@@ -340,7 +346,7 @@ export default function FactInnovation() {
   );
 
   return (
-    <div className="min-h-screen bg-white py-12">
+    <div className="min-h-screen bg-white py-12" id="fact">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mt-20 text-center mb-12">
@@ -352,7 +358,7 @@ export default function FactInnovation() {
           </p>
         </div>
 
-        {/* Tab Navigation - Semua Device (Desktop & Mobile) */}
+        {/* Tab Navigation - Semua Device */}
         <div className="mb-12">
           {/* Desktop Version */}
           <div className="hidden md:flex flex-wrap justify-center gap-3">
@@ -443,43 +449,98 @@ export default function FactInnovation() {
 
         {/* References Section */}
         <div className="mt-16 pt-8 border-t-2 border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <BookOpen className="w-6 h-6" />
-            Daftar Referensi
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <BookOpen className="w-6 h-6" />
+              Daftar Referensi
+            </h2>
+            {/* Toggle Button - Mobile Only */}
+            <button
+              onClick={() => setShowAllReferences(!showAllReferences)}
+              className="md:hidden flex items-center gap-2 px-3 py-1.5 bg-[#005792] text-white rounded-lg text-sm font-medium hover:bg-[#004570] transition-colors"
+            >
+              {showAllReferences ? (
+                <>
+                  Sembunyikan
+                  <ChevronUp className="w-4 h-4" />
+                </>
+              ) : (
+                <>
+                  Lihat ({Object.keys(SOURCES).length})
+                  <ChevronDown className="w-4 h-4" />
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Desktop - Always Show All */}
+          <div className="hidden md:grid grid-cols-1 md:grid-cols-2 gap-4">
             {Object.values(SOURCES).map((source) => (
-              <a
-                key={source.id}
-                href={source.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-gray-50 hover:bg-gray-100 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-all group"
-              >
-                <div className="flex items-start gap-3">
-                  <span className="text-sm font-bold text-[#005792] shrink-0">
-                    [{source.id}]
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-1 group-hover:text-[#005792] line-clamp-2">
-                      {source.title}
-                    </h4>
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <span className="truncate">{source.publisher}</span>
-                      <span>•</span>
-                      <span>{source.year}</span>
-                    </div>
-                  </div>
-                  <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-[#005792] shrink-0" />
-                </div>
-              </a>
+              <ReferenceCard key={source.id} source={source} />
             ))}
+          </div>
+
+          {/* Mobile - Collapsible */}
+          {/* Mobile - Alternative with Max-Height */}
+          <div className="md:hidden">
+            <div
+              className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                showAllReferences
+                  ? "max-h-[5000px] opacity-100"
+                  : "max-h-0 opacity-0"
+              }`}
+            >
+              <div className="space-y-3 pb-4">
+                {Object.values(SOURCES).map((source) => (
+                  <ReferenceCard key={source.id} source={source} />
+                ))}
+              </div>
+            </div>
+
+            {!showAllReferences && (
+              <div className="text-center py-8 bg-gray-50 rounded-xl border border-gray-200">
+                <BookOpen className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                <p className="text-gray-600 text-sm mb-1 font-medium">
+                  {Object.keys(SOURCES).length} Referensi Tersedia
+                </p>
+                <p className="text-gray-500 text-xs">
+                  Klik "Lihat" untuk melihat daftar lengkap
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+// Reference Card Component - IMPROVED
+const ReferenceCard = ({ source }: { source: any }) => (
+  <a
+    href={source.url}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="bg-gray-50 hover:bg-gray-100 rounded-xl p-3 md:p-4 border border-gray-200 hover:border-[#005792] transition-all group block"
+  >
+    <div className="flex items-start gap-2 md:gap-3">
+      <span className="text-xs md:text-sm font-bold text-[#005792] shrink-0 mt-0.5">
+        [{source.id}]
+      </span>
+      <div className="flex-1 min-w-0">
+        <h4 className="text-xs md:text-sm font-semibold text-gray-900 mb-1 group-hover:text-[#005792] line-clamp-2 leading-snug">
+          {source.title}
+        </h4>
+        <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs text-gray-500">
+          <span className="truncate">{source.publisher}</span>
+          <span>•</span>
+          <span className="shrink-0">{source.year}</span>
+        </div>
+      </div>
+      <ExternalLink className="w-3 h-3 md:w-4 md:h-4 text-gray-400 group-hover:text-[#005792] shrink-0 mt-1" />
+    </div>
+  </a>
+);
 
 // Problem Tab
 const ProblemTab = ({ data, renderSourceBadges }: any) => (
@@ -517,7 +578,7 @@ const ProblemTab = ({ data, renderSourceBadges }: any) => (
                     <div className="text-xs text-gray-500 mb-1">
                       {stat.label}
                     </div>
-                    <div className="flex wrap gap-1">
+                    <div className="flex flex-wrap gap-1">
                       {stat.source.map((src: string) => (
                         <span key={src} className="text-xs text-biru-muda">
                           [{src}]
@@ -575,7 +636,7 @@ const SolutionTab = ({ data, renderSourceBadges }: any) => (
                     <div className="text-xs text-gray-500 mb-1">
                       {stat.label}
                     </div>
-                    <div className="flex wrap gap-1">
+                    <div className="flex flex-wrap gap-1">
                       {stat.source.map((src: string) => (
                         <span key={src} className="text-xs text-biru-muda">
                           [{src}]
@@ -597,7 +658,7 @@ const SolutionTab = ({ data, renderSourceBadges }: any) => (
   </div>
 );
 
-// Tech Tab - UPDATED
+// Tech Tab
 const TechTab = ({ data, renderSourceBadges }: any) => (
   <div className="p-6 md:p-8">
     <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
@@ -622,7 +683,7 @@ const TechTab = ({ data, renderSourceBadges }: any) => (
               className="relative flex gap-3 mb-6 last:mb-0"
             >
               {/* Step Number & Icon - Mobile */}
-              <div className="lg:hidden flex col items-center gap-2 shrink-0">
+              <div className="lg:hidden flex flex-col items-center gap-2 shrink-0">
                 <div className="w-10 h-10 rounded-lg bg-[#005792] text-white flex items-center justify-center font-bold text-sm">
                   {process.step}
                 </div>
@@ -637,9 +698,9 @@ const TechTab = ({ data, renderSourceBadges }: any) => (
               </div>
 
               {/* Content Card */}
-              <div className="1 bg-gray-50/50 rounded-xl p-4 md:p-6 border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all min-w-0">
+              <div className="flex-1 bg-gray-50/50 rounded-xl p-4 md:p-6 border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all min-w-0">
                 <div className="flex items-start gap-3">
-                  <div className="1 min-w-0">
+                  <div className="flex-1 min-w-0">
                     <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
                       {process.title}
                     </h3>
@@ -662,14 +723,14 @@ const TechTab = ({ data, renderSourceBadges }: any) => (
   </div>
 );
 
-// Impact Tab - UPDATED
+// Impact Tab
 const ImpactTab = ({ data, renderSourceBadges }: any) => (
   <div className="p-6 md:p-8">
     <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">
       Dampak & Pencapaian
     </h2>
 
-    {/* Metrics - Sekarang CENTERED */}
+    {/* Metrics */}
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
       {data.metrics.map((impact: any, i: number) => (
         <motion.div
@@ -705,7 +766,7 @@ const ImpactTab = ({ data, renderSourceBadges }: any) => (
         const colorClass =
           category.color === "blue" ? "bg-[#005792]" : "bg-[#007850]";
         const checkColor =
-          category.color === "blue" ? "text-biru-muda" : "text-green-600";
+          category.color === "blue" ? "text-biru-muda" : "text-[#007850]";
 
         return (
           <motion.div
