@@ -22,6 +22,16 @@ import {
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Fakta - Bara Project",
+  description: "Fakta Bara Project",
+  alternates: {
+    canonical: "https://baraproject.site/about",
+  },
+};
+
 // ============================================
 // DATA SECTION - Mudah diubah
 // ============================================

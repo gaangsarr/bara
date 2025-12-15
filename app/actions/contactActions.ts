@@ -14,8 +14,6 @@ export async function submitContactForm(formData: FormData) {
     const subject = formData.get("subject") as string;
     const message = formData.get("message") as string;
 
-    console.log("📝 Form data received:", { name, email, subject });
-
     // Validasi basic
     if (!name || !email || !message) {
       console.error("❌ Validation failed: Missing fields");

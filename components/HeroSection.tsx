@@ -4,6 +4,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, Variants } from "framer-motion";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Home - Bara Project",
+  description: "Home Bara Project",
+  alternates: {
+    canonical: "https://baraproject.site/about",
+  },
+};
+
 export default function HeroSection() {
   const containerVariants: Variants = {
     hidden: { opacity: 0 },

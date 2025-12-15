@@ -1,8 +1,13 @@
 import ContactForm from "@/components/ContactForm";
 
-export const metadata = {
-  title: "Contact Us - BaraApp",
-  description: "Hubungi kami untuk pertanyaan atau informasi lebih lanjut",
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Contact - Bara Project",
+  description: "Kontak Bara Project",
+  alternates: {
+    canonical: "https://baraproject.site/about",
+  },
 };
 
 export default function ContactPage() {

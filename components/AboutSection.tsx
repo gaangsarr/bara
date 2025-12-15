@@ -3,6 +3,16 @@
 import Image from "next/image";
 import { useState } from "react";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About - Bara Project",
+  description: "Tentang Bara Project",
+  alternates: {
+    canonical: "https://baraproject.site/about",
+  },
+};
+
 type SDGGoal = {
   number: number;
   title: string;
