@@ -4,6 +4,7 @@ import BarraInnovationData from "../components/DataPage";
 import FactInnovation from "@/components/FactInnovation";
 import ContactForm from "@/components/ContactForm";
 import OurTeams from "@/components/OurTeam";
+import ContactHome from "@/components/ContactHome";
 
 import { Metadata } from "next";
 
@@ -22,6 +23,7 @@ export default function Home() {
       <AboutSection />
       <FactInnovation />
       <OurTeams />
+      <ContactHome />
     </div>
   );
 }

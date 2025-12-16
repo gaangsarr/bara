@@ -28,8 +28,8 @@ const teamMembers: TeamMember[] = [
     name: "Abdul Akyas Sugianto",
     role: "The Hipster",
     image: "/team/gangsar.png",
-    instagram: "https://instagram.com/abdul",
-    linkedin: "https://linkedin.com/in/abdul",
+    instagram: "https://instagram.com/abd.akyas_",
+    linkedin: "http://linkedin.com/in/abdul-akyas-sugianto",
     featured: true,
   },
   {
@@ -37,8 +37,8 @@ const teamMembers: TeamMember[] = [
     name: "Aisyah Nur Kusuma Wardani",
     role: "The Hustler",
     image: "/team/gangsar.png",
-    instagram: "https://instagram.com/aisyah",
-    linkedin: "https://linkedin.com/in/aisyah",
+    instagram: "https://instagram.com/syawarrrr",
+    linkedin: "https://linkedin.com/in/aisyah-nur-kusuma",
     featured: true,
   },
 ];
@@ -50,12 +50,12 @@ const OurTeams = () => {
         {/* Header */}
         <div className="flex items-center justify-center gap-2 mb-3 md:mb-4">
           <span className="text-gray-600 font-medium text-sm md:text-base">
-            Our Team
+            Ayo Lihat
           </span>
         </div>
 
         <h2 className="text-3xl md:text-5xl font-bold text-center text-[#005792] mb-8 md:mb-12">
-          Meet Our BARA Team
+          Kelompok BARA
         </h2>
 
         {/* Desktop Grid */}

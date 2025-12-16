@@ -49,7 +49,7 @@ export default function ContactForm() {
       <div>
         <label
           htmlFor="name"
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="block text-sm font-medium text-black mb-2"
         >
           Nama Lengkap <span className="text-red-500">*</span>
         </label>
@@ -60,7 +60,7 @@ export default function ContactForm() {
           required
           disabled={isPending}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-          placeholder="Gangsar Anjasmoro"
+          placeholder="Nama Kamu"
         />
       </div>
 
@@ -68,7 +68,7 @@ export default function ContactForm() {
       <div>
         <label
           htmlFor="email"
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="block text-sm font-medium text-black mb-2"
         >
           Email <span className="text-red-500">*</span>
         </label>
@@ -79,7 +79,7 @@ export default function ContactForm() {
           required
           disabled={isPending}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-          placeholder="gangsar2431170@itpln.ac.id"
+          placeholder="emailkamu@itpln.ac.id"
         />
       </div>
 
@@ -87,7 +87,7 @@ export default function ContactForm() {
       <div>
         <label
           htmlFor="subject"
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="block text-sm font-medium text-black mb-2"
         >
           Subjek (Opsional)
         </label>
@@ -105,7 +105,7 @@ export default function ContactForm() {
       <div>
         <label
           htmlFor="message"
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="block text-sm font-medium text-black mb-2"
         >
           Pesan <span className="text-red-500">*</span>
         </label>
