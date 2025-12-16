@@ -10,7 +10,7 @@ export default function robots(): MetadataRoute.Robots {
         "/admin/messages/",
         "/config/",
         "/_next/",
-        "3dModelDebug",
+        "/3dModelDebug/",
       ],
     },
     sitemap: "https://baraproject.site/sitemap.xml",

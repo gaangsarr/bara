@@ -16,7 +16,7 @@ export default function Navbar() {
     { href: "/3d-model", label: "3D Model" },
     { href: "#about", label: "About" },
     { href: "/#fact", label: "Fact" },
-    { href: "/our-team", label: "Our Team" },
+    { href: "/#our-team", label: "Our Team" },
     { href: "/contact", label: "Contact" },
   ];
 
@@ -26,9 +26,9 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center z-50">
-            <div className="relative w-[90%] min-w-13 max-w-[60px] aspect-1277/1952 transition-transform duration-300 ease-in-out hover:scale-110">
+            <div className="rotate-90 relative w-[90%] min-w-13 max-w-[60px] aspect-1277/1952 transition-transform duration-300 ease-in-out hover:scale-110">
               <Image
-                src="/LOGO-BARA.png"
+                src="/BARALOGO-PUTIH.png"
                 alt="Logo"
                 fill
                 className="object-contain"
