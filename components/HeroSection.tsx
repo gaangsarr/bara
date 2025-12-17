@@ -91,15 +91,6 @@ export default function HeroSection() {
                     "linear-gradient(135deg, #005792 0%, #003D5C 100%)",
                 }}
               >
-                <span className="flex items-center justify-center w-6 h-6 bg-orange-500 rounded-sm">
-                  <svg
-                    className="w-3 h-3 ml-0.5"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </span>
                 3D Model
               </motion.button>
             </Link>

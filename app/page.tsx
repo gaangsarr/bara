@@ -5,6 +5,7 @@ import FactInnovation from "@/components/FactInnovation";
 import ContactForm from "@/components/ContactForm";
 import OurTeams from "@/components/OurTeam";
 import ContactHome from "@/components/ContactHome";
+import TextMarquee from "@/components/TextMarquee";
 
 import { Metadata } from "next";
 
@@ -22,6 +23,7 @@ export default function Home() {
       <HeroSection />
       <AboutSection />
       <FactInnovation />
+      {/* <TextMarquee /> */}
       <OurTeams />
       <ContactHome />
     </div>

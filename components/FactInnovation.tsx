@@ -356,7 +356,13 @@ export default function FactInnovation() {
   );
 
   return (
-    <div className="min-h-screen bg-white py-12" id="fact">
+    <div
+      className="min-h-screen py-12"
+      id="fact"
+      style={{
+        background: "linear-gradient(180deg, #FFFFFF 80%, #7dcbf8 100%)",
+      }}
+    >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mt-20 text-center mb-12">
