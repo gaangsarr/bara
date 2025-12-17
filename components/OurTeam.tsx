@@ -46,18 +46,14 @@ const teamMembers: TeamMember[] = [
 const OurTeams = () => {
   return (
     <section
-      className="py-12 md:py-20 px-4 bg-gradient-to-b from-white via-blue-50/30 to-white relative overflow-hidden"
       id="our-team"
+      className="py-12 md:py-20 px-4 bg-gradient-to-b from-white via-blue-50/30 to-white relative overflow-hidden"
     >
-      {/* Decorative Background Elements */}
-      <div className="absolute top-20 left-0 w-72 h-72 bg-[#005792]/5 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-20 right-0 w-96 h-96 bg-blue-400/5 rounded-full blur-3xl"></div>
-
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header with Subtitle */}
-        <div className="text-center mb-12 md:mb-16">
+        <div className="text-center mb-5 md:mb-5">
           <div className="inline-block">
-            <span className="text-[#005792] font-semibold text-sm md:text-base tracking-wider uppercase mb-3 block">
+            <span className="text-[#005792] font-semibold text-sm md:text-base tracking-wider uppercase mb-3 block mt-10">
               Meet The Team
             </span>
             <h2 className="text-4xl md:text-6xl font-bold text-[#005792] mb-4 relative">
@@ -76,7 +72,7 @@ const OurTeams = () => {
                 alt="BARA Team"
                 fill
                 className="object-contain group-hover:scale-105 transition-transform duration-700"
-                sizes="2500px, 1875px"
+                sizes="(max-width: 768px) 100vw, 896px"
                 priority
               />
               {/* Gradient Overlay */}
@@ -89,10 +85,6 @@ const OurTeams = () => {
                 3 Innovators
               </p>
             </div>
-
-            {/* Decorative Corner Accents */}
-            <div className="absolute -top-4 -left-4 w-20 h-20 border-t-4 border-l-4 border-[#005792] rounded-tl-3xl hidden md:block"></div>
-            <div className="absolute -bottom-4 -right-4 w-20 h-20 border-b-4 border-r-4 border-[#005792] rounded-br-3xl hidden md:block"></div>
           </div>
         </div>
 
@@ -141,21 +133,26 @@ const TeamCard = ({ member, index }: { member: TeamMember; index: number }) => {
             sizes="(max-width: 768px) 50vw, 33vw"
           />
 
-          {/* Gradient Overlay on Hover */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#005792]/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          {/* Gradient Overlay on Hover (Desktop only) */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#005792]/90 via-transparent to-transparent opacity-0 md:group-hover:opacity-100 transition-opacity duration-500"></div>
 
           {/* Social Icons */}
           {member.featured && (
-            <div className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 md:gap-3 z-10 opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0 transition-all duration-500">
+            <div
+              className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 md:gap-3 z-10 
+              opacity-100 md:opacity-0 md:group-hover:opacity-100 
+              transform translate-x-0 md:translate-x-4 md:group-hover:translate-x-0 
+              transition-all duration-500"
+            >
               {member.instagram && (
                 <a
                   href={member.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center hover:bg-[#005792] hover:text-white transition-all duration-200 shadow-lg group/icon"
+                  className="w-8 h-8 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center hover:bg-[#005792] transition-all duration-200 shadow-lg group/icon"
                   aria-label="Instagram"
                 >
-                  <Instagram className="w-5 h-5 md:w-6 md:h-6 text-[#005792] group-hover/icon:text-white" />
+                  <Instagram className="w-4 h-4 md:w-6 md:h-6 text-[#005792] group-hover/icon:text-white" />
                 </a>
               )}
               {member.linkedin && (
@@ -163,10 +160,10 @@ const TeamCard = ({ member, index }: { member: TeamMember; index: number }) => {
                   href={member.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center hover:bg-[#005792] hover:text-white transition-all duration-200 shadow-lg group/icon"
+                  className="w-8 h-8 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center hover:bg-[#005792] transition-all duration-200 shadow-lg group/icon"
                   aria-label="LinkedIn"
                 >
-                  <Linkedin className="w-5 h-5 md:w-6 md:h-6 text-[#005792] group-hover/icon:text-white" />
+                  <Linkedin className="w-4 h-4 md:w-6 md:h-6 text-[#005792] group-hover/icon:text-white" />
                 </a>
               )}
             </div>
