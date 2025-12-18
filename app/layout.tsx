@@ -12,6 +12,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://baraproject.site"),
   title: "BARA | Coastal Resilience Engine",
   description: "Sand Battery Energy Storage System - Renewable Energy Solution",
   keywords: ["sand battery", "renewable energy", "energy storage"],
@@ -24,6 +25,19 @@ export const metadata: Metadata = {
     title: "BARA PROJECT",
     description: "Sand Battery Energy Storage System",
     type: "website",
+    url: "https://baraproject.site",
+    siteName: "BARA PROJECT",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
+  verification: {
+    google: "googleb396185b540c853d",
   },
 };
 
@@ -34,7 +48,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={poppins.variable}>
-      <body>
+      <head>
+        <link rel="canonical" href="https://baraproject.site" />
+      </head>
+      <body className="min-h-screen">
         <LayoutWrapper>
           {children}
           <Footer />
