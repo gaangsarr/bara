@@ -14,6 +14,7 @@ export default function Navbar() {
   const menuItems = [
     { href: "/", label: "Home" },
     { href: "/3d-model", label: "3D Model" },
+    { href: "/game", label: "Game" },
     { href: "#about", label: "About" },
     { href: "/#fact", label: "Fact" },
     { href: "/#our-team", label: "Our Team" },

@@ -79,11 +79,12 @@ export default function HeroSection() {
             seawater desalination for national water security.
           </motion.p>
 
-          <motion.div variants={itemVariants}>
+          {/* Mobile Buttons - Inline & Compact */}
+          <motion.div variants={itemVariants} className="flex flex-row gap-3">
             <Link href="/3d-model">
               <motion.button
                 className="px-6 py-3 rounded-full font-semibold text-sm
-                text-white inline-flex items-center gap-2 shadow-xl"
+          text-white inline-flex items-center gap-2 shadow-xl"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 style={{
@@ -92,6 +93,21 @@ export default function HeroSection() {
                 }}
               >
                 3D Model
+              </motion.button>
+            </Link>
+
+            <Link href="/game">
+              <motion.button
+                className="px-6 py-3 rounded-full font-semibold text-sm
+          text-white inline-flex items-center gap-2 shadow-xl"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                style={{
+                  background:
+                    "linear-gradient(135deg, #FF6B35 0%, #F7931E 100%)",
+                }}
+              >
+                BARA Game
               </motion.button>
             </Link>
           </motion.div>
@@ -183,7 +199,11 @@ export default function HeroSection() {
                 seawater desalination for national water security.
               </motion.p>
 
-              <motion.div variants={itemVariants}>
+              {/* Desktop Buttons with Gap */}
+              <motion.div
+                variants={itemVariants}
+                className="flex flex-row gap-3 md:gap-4 lg:gap-5"
+              >
                 <Link href="/3d-model">
                   <motion.button
                     className="px-6 py-3 md:px-8 md:py-4 rounded-full font-semibold text-sm md:text-base
@@ -196,6 +216,21 @@ export default function HeroSection() {
                     }}
                   >
                     3D Model
+                  </motion.button>
+                </Link>
+
+                <Link href="/game">
+                  <motion.button
+                    className="px-6 py-3 md:px-8 md:py-4 rounded-full font-semibold text-sm md:text-base
+                    text-white inline-flex items-center gap-2 md:gap-3 shadow-2xl"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    style={{
+                      background:
+                        "linear-gradient(135deg, #FF6B35 0%, #F7931E 100%)",
+                    }}
+                  >
+                    BARA Game
                   </motion.button>
                 </Link>
               </motion.div>
