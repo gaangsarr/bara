@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     await dbConnect();
 
     const body = await request.json();
-    const { name, institution, answers } = body;
+    const { name, institution, answers, timeElapsed } = body;
 
     // Validasi input
     if (!name || !institution || !answers || !Array.isArray(answers)) {
@@ -15,6 +15,11 @@ export async function POST(request: NextRequest) {
         { error: "Data tidak lengkap" },
         { status: 400 }
       );
+    }
+
+    // Validasi timeElapsed
+    if (typeof timeElapsed !== "number" || timeElapsed < 0) {
+      return NextResponse.json({ error: "Waktu tidak valid" }, { status: 400 });
     }
 
     // Hitung score dan statistik
@@ -38,6 +43,7 @@ export async function POST(request: NextRequest) {
       score,
       correctAnswers,
       wrongAnswers,
+      timeElapsed, // BARU: simpan waktu
       answers,
       completedAt: new Date(),
     });
@@ -51,6 +57,7 @@ export async function POST(request: NextRequest) {
           score: participant.score,
           correctAnswers: participant.correctAnswers,
           wrongAnswers: participant.wrongAnswers,
+          timeElapsed: participant.timeElapsed,
         },
       },
       { status: 201 }

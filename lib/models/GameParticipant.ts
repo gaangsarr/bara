@@ -6,6 +6,7 @@ export interface IGameParticipant extends Document {
   score: number;
   correctAnswers: number;
   wrongAnswers: number;
+  timeElapsed: number; // BARU: waktu dalam detik
   answers: {
     questionId: number;
     answer: string;
@@ -45,6 +46,11 @@ const GameParticipantSchema = new Schema<IGameParticipant>({
     default: 0,
     min: 0,
   },
+  timeElapsed: {
+    type: Number,
+    required: true,
+    min: 0,
+  },
   answers: [
     {
       questionId: Number,
@@ -63,8 +69,8 @@ const GameParticipantSchema = new Schema<IGameParticipant>({
   },
 });
 
-// Index untuk performa leaderboard
-GameParticipantSchema.index({ score: -1, completedAt: 1 });
+// Index untuk performa leaderboard: Sort by score DESC, timeElapsed ASC
+GameParticipantSchema.index({ score: -1, timeElapsed: 1 });
 
 export default mongoose.models.GameParticipant ||
   mongoose.model<IGameParticipant>("GameParticipant", GameParticipantSchema);
